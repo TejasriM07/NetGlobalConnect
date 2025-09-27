@@ -49,4 +49,28 @@ const getUserById = async (req, res) => {
   }
 };
 
-module.exports = { getProfile, updateProfile, getUserById };
+const sendConnectionRequest = async (req, res) => {
+  try {
+    const { id } = req.params; // target user id
+    const currentUser = req.user._id; // logged-in user from protect middleware
+
+    if (id === currentUser.toString()) {
+      return res.status(400).json({ message: "You cannot connect with yourself." });
+    }
+
+    // TODO: implement your connection model logic here
+    // e.g., save request in DB
+    // await Connection.create({ from: currentUser, to: id, status: "pending" });
+
+    res.status(201).json({ message: "Connection request sent successfully." });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+module.exports = {
+  getProfile,
+  updateProfile,
+  getUserById,
+  sendConnectionRequest, // ✅ add this
+};
