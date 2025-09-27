@@ -5,6 +5,7 @@ const cors = require('cors');
 const passport = require('passport');
 
 const connectDB = require('./src/config/db');
+const jobRoutes =require ('./src/routes/jobRoutes')
 const authRoutes = require('./src/routes/authRoutes');
 const userRoutes = require("./src/routes/userRoutes");
 require('./src/services/googleAuthService');
@@ -20,6 +21,7 @@ app.use(passport.initialize());
 
 app.use('/api/auth', authRoutes);
 app.use("/api/users", userRoutes);
+app.use('/api/jobs',jobRoutes);
 
 app.use((err, req, res, next) => {
   console.error(err);
