@@ -1,6 +1,7 @@
 const jwt = require("jsonwebtoken");
 const User = require("../models/User");
 
+
 const verifyJWT = (req, res, next) => {
   const authHeader = req.headers.authorization || "";
   const token = authHeader.startsWith("Bearer ")
@@ -66,6 +67,9 @@ const protect = async (req, res, next) => {
     return res
       .status(401)
       .json({ success: false, message: "No token, authorization denied" });
+
+      next();
+
   }
 };
 

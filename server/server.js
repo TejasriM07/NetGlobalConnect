@@ -8,6 +8,16 @@ const http = require("http");
 const connectDB = require("./src/config/db");
 const jobRoutes = require("./src/routes/jobRoutes");
 const authRoutes = require("./src/routes/authRoutes");
+
+require('dotenv').config();
+require('express-async-errors');
+const express = require('express');
+const cors = require('cors');
+const passport = require('passport');
+
+const connectDB = require('./src/config/db');
+const jobRoutes =require ('./src/routes/jobRoutes')
+const authRoutes = require('./src/routes/authRoutes');
 const userRoutes = require("./src/routes/userRoutes");
 const feedRoutes = require("./src/routes/feedRoutes");
 require("./src/services/googleAuthService");
@@ -32,6 +42,7 @@ app.use("/api/users", userRoutes);
 app.use("/api/jobs", jobRoutes);
 app.use("/api/posts/feed", feedRoutes);
 app.use("/api/messages", require("./src/routes/messageRoutes"));
+app.use('/api/jobs',jobRoutes);
 
 // Error handling
 app.use((err, req, res, next) => {
