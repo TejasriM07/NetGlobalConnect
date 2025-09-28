@@ -1,36 +1,28 @@
-const express = require('express');
+const express = require("express");
 const router = express.Router();
-const jobController = require('../controllers/jobController');
-const { protect,roleCheck } = require('../middlewares/authMiddleware');
+const jobController = require("../controllers/jobController");
+const { protect, roleCheck } = require("../middlewares/authMiddleware");
 
+// Employee can post a job
+router.post("/", protect, roleCheck(["Employee"]), jobController.postJob);
 
+// All users can get all jobs
+router.get("/", protect, jobController.listJobs);
 
-// ✅ Employee: Create a job
+// Only JobSeekers can apply for the Job
 router.post(
-  '/',
+  "/apply/:jobId",
   protect,
-  roleCheck(['Employee']),
-  jobController.createJob
+  roleCheck(["JobSeeker"]),
+  jobController.applyJob
 );
 
-// ✅ JobSeeker: Apply for a job
-router.post(
-  '/:id/apply',
-  protect,
-  roleCheck(['JobSeeker']),
-  jobController.applyForJob
-);
-
-// ✅ Employee: Manage applications for a specific job
+// Admin can see who applied for which job and Employee can see only for their posted jobs
 router.get(
-  '/:jobId/applications',
+  "/:jobId/applicants",
   protect,
-  roleCheck(['Employee']),
-  jobController.manageApplications
+  roleCheck(["Admin", "Employee"]),
+  jobController.getApplicants
 );
-
-
-router.get('/*', jobController.getJobs); 
-
 
 module.exports = router;

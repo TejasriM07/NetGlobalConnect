@@ -1,16 +1,18 @@
-const mongoose = require('mongoose');
+const mongoose = require("mongoose");
 
-const JobSchema = new mongoose.Schema({
+const jobSchema = new mongoose.Schema(
+  {
+    postedBy: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      required: true,
+    },
     title: { type: String, required: true },
     description: { type: String, required: true },
-    company: { type: String, required: true },
-    // Link to the user who posted the job (Must be an Employee)
-    postedBy: { 
-        type: mongoose.Schema.Types.ObjectId, 
-        ref: 'User', 
-        required: true 
-    }, 
-    isActive: { type: Boolean, default: true }
-}, { timestamps: true });
+    skills: [{ type: String }],
+    applicants: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
+  },
+  { timestamps: true }
+); // createdAt, updatedAt
 
-module.exports = mongoose.model('Job', JobSchema);
+module.exports = mongoose.model("Job", jobSchema);

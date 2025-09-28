@@ -1,73 +1,88 @@
-const asyncHandler = require('../middlewares/asyncHandler');
-const Job = require('../models/Job');
-const Application = require('../models/Application');
+const Job = require("../models/Job");
+const User = require("../models/User");
 
-// Employee: Can post jobs
-exports.createJob = asyncHandler(async (req, res) => {
-  const { title, description, company } = req.body;
+// Employee: Post a job
+exports.postJob = async (req, res) => {
+  try {
+    const { title, description, skills } = req.body;
 
-  const job = await Job.create({
-    title,
-    description,
-    company,
-    postedBy: req.user._id, // employee user
-  });
+    const job = await Job.create({
+      postedBy: req.user._id,
+      title,
+      description,
+      skills,
+    });
 
-  res.status(201).json(job);
-});
-
-// Jobseeker: Can apply for jobs
-exports.applyForJob = asyncHandler(async (req, res) => {
-  const { coverLetter } = req.body;
-  const jobId = req.params.id;
-
-  // Check if already applied
-  const existingApplication = await Application.findOne({
-    job: jobId,
-    jobseeker: req.user._id,
-  });
-
-  if (existingApplication) {
-    return res.status(400).json({ message: 'You have already applied for this job.' });
+    res.status(201).json({ success: true, job });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ success: false, message: "Server Error" });
   }
+};
 
-  const application = await Application.create({
-    job: jobId,
-    jobseeker: req.user._id,
-    coverLetter,
-  });
-
-  res.status(201).json({ message: 'Application submitted successfully', application });
-});
-
-// Employee: Manage applications
-exports.manageApplications = asyncHandler(async (req, res) => {
-  const job = await Job.findOne({
-    _id: req.params.jobId,
-    postedBy: req.user._id, // only owner can see
-  });
-
-  if (!job) {
-    return res.status(404).json({ message: 'Job not found or unauthorized.' });
+// List all jobs
+exports.listJobs = async (req, res) => {
+  try {
+    const jobs = await Job.find().populate("postedBy", "name email");
+    res.status(200).json({ success: true, count: jobs.length, jobs });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ success: false, message: "Server Error" });
   }
+};
 
-  const applications = await Application.find({ job: req.params.jobId })
-    .populate('jobseeker', 'username email'); // fetch jobseeker details
+// JobSeeker: Apply to job
+exports.applyJob = async (req, res) => {
+  try {
+    const job = await Job.findById(req.params.jobId);
+    if (!job)
+      return res.status(404).json({ success: false, message: "Job not found" });
 
-  res.status(200).json({ jobTitle: job.title, applications });
-});
+    // Check if already applied
+    if (job.applicants.includes(req.user._id)) {
+      return res
+        .status(400)
+        .json({ success: false, message: "Already applied to this job" });
+    }
 
-// ✅ FIX: General: View jobs
-exports.getJobs = asyncHandler(async (req, res) => {
-  let jobs;
+    job.applicants.push(req.user._id);
+    await job.save();
 
-  if (req.user && req.user.role === 'Employee') {
-    // Employees see their own jobs
-    jobs = await Job.find({ postedBy: req.user._id });
-  } else {
-    // JobSeekers or others see all jobs
-    jobs = await Job.find();
+    res
+      .status(200)
+      .json({ success: true, message: "Applied successfully", job });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ success: false, message: "Server Error" });
   }
+};
 
-  res.status(200).json({ count: jobs.length, jobs });
-});
+// Admin or Employee: Get applicants for a specific job
+exports.getApplicants = async (req, res) => {
+  try {
+    const job = await Job.findById(req.params.jobId).populate(
+      "applicants",
+      "name email role"
+    );
+
+    if (!job)
+      return res.status(404).json({ success: false, message: "Job not found" });
+
+    // Employee can only see their own jobs
+    if (req.user.role === "Employee" && job.postedBy.toString() !== req.user._id.toString()) {
+      return res.status(403).json({ success: false, message: "Forbidden: You can only view applicants for your jobs" });
+    }
+
+    res.status(200).json({
+      success: true,
+      job: {
+        title: job.title,
+        description: job.description,
+        applicants: job.applicants,
+      },
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ success: false, message: "Server Error" });
+  }
+};
