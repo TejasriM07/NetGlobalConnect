@@ -6,6 +6,7 @@ const passport = require("passport");
 const http = require("http");
 
 const connectDB = require("./src/config/db");
+const jobRoutes = require("./src/routes/jobRoutes");
 const authRoutes = require("./src/routes/authRoutes");
 const userRoutes = require("./src/routes/userRoutes");
 const feedRoutes = require("./src/routes/feedRoutes");
@@ -28,6 +29,7 @@ app.use(passport.initialize());
 // Routes
 app.use("/api/auth", authRoutes);
 app.use("/api/users", userRoutes);
+app.use("/api/jobs", jobRoutes);
 app.use("/api/posts/feed", feedRoutes);
 app.use("/api/messages", require("./src/routes/messageRoutes"));
 
