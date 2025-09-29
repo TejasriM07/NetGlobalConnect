@@ -1,19 +1,15 @@
-require("dotenv").config();
-require("express-async-errors");
-const express = require("express");
-const cors = require("cors");
-const passport = require("passport");
-const http = require("http");
-
-const connectDB = require("./src/config/db");
-const jobRoutes = require("./src/routes/jobRoutes");
-const authRoutes = require("./src/routes/authRoutes");
-
 require('dotenv').config();
 require('express-async-errors');
 const express = require('express');
 const cors = require('cors');
 const passport = require('passport');
+const http = require("http");
+const connectDB = require("./src/config/db");
+const app = require("./app"); 
+const { initSocket } = require("./src/services/socketService");
+
+const jobRoutes = require("./src/routes/jobRoutes");
+const authRoutes = require("./src/routes/authRoutes");
 
 const connectDB = require('./src/config/db');
 const jobRoutes =require ('./src/routes/jobRoutes')
@@ -22,6 +18,8 @@ const userRoutes = require("./src/routes/userRoutes");
 const feedRoutes = require("./src/routes/feedRoutes");
 const postRoutes = require("./src/routes/postRoutes");
 require("./src/services/googleAuthService");
+
+const PORT = process.env.PORT || 5000;
 
 // Socket.IO service
 const { initSocket } = require("./src/services/socketService");
@@ -58,10 +56,10 @@ app.use((err, req, res, next) => {
 // Creating HTTP server
 const server = http.createServer(app);
 
-// Initializing Socket.IO
+// Initialize Socket.IO
 initSocket(server);
 
-const PORT = process.env.PORT || 5000;
+// Connect to DB and start server
 connectDB()
   .then(() => {
     server.listen(PORT, () => console.log(`Server running on port ${PORT}`));

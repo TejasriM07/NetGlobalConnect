@@ -4,10 +4,7 @@ const User = require("../models/User");
 const sendConnectionRequest = async (req, res) => {
   try {
     const targetUser = await User.findById(req.params.id);
-    if (!targetUser)
-      return res
-        .status(404)
-        .json({ success: false, message: "User not found" });
+    if (!targetUser) return res.status(404).json({ message: "User not found" });
 
     // Already connected or requested
     if (
@@ -16,31 +13,28 @@ const sendConnectionRequest = async (req, res) => {
     ) {
       return res
         .status(400)
-        .json({ success: false, message: "Already connected or requested" });
+        .json({ message: "Already connected or requested" });
     }
 
     targetUser.connectionRequests.push(req.user._id);
     await targetUser.save();
 
-    res.json({ success: true, message: "Connection request sent" });
+    res.status(200).json({ message: "Connection request sent" });
   } catch (err) {
     console.error(err);
-    res.status(500).json({ success: false, message: "Server Error" });
+    res.status(500).json({ message: "Server Error" });
   }
 };
 
 // Accept connection request
 const acceptConnectionRequest = async (req, res) => {
   try {
-    const user = req.user; // Already populated by protect
+    const user = await User.findById(req.user._id);
     const requesterId = req.params.id;
 
     if (!user.connectionRequests.includes(requesterId))
-      return res
-        .status(400)
-        .json({ success: false, message: "No such request found" });
+      return res.status(400).json({ message: "No such request found" });
 
-    // Add to connections
     user.connections.push(requesterId);
     user.connectionRequests = user.connectionRequests.filter(
       (id) => id.toString() !== requesterId
@@ -52,33 +46,32 @@ const acceptConnectionRequest = async (req, res) => {
     await user.save();
     await requester.save();
 
-    res.json({ success: true, message: "Connection accepted" });
+    res.status(200).json({ message: "Connection accepted" });
   } catch (err) {
     console.error(err);
-    res.status(500).json({ success: false, message: "Server Error" });
+    res.status(500).json({ message: "Server Error" });
   }
 };
 
 // Reject connection request
 const rejectConnectionRequest = async (req, res) => {
   try {
-    const user = req.user; // Already populated
+    const user = await User.findById(req.user._id);
     const requesterId = req.params.id;
 
     if (!user.connectionRequests.includes(requesterId))
-      return res
-        .status(400)
-        .json({ success: false, message: "No such request found" });
+      return res.status(400).json({ message: "No such request found" });
 
     user.connectionRequests = user.connectionRequests.filter(
       (id) => id.toString() !== requesterId
     );
+
     await user.save();
 
-    res.json({ success: true, message: "Connection request rejected" });
+    res.status(200).json({ message: "Connection request rejected" });
   } catch (err) {
     console.error(err);
-    res.status(500).json({ success: false, message: "Server Error" });
+    res.status(500).json({ message: "Server Error" });
   }
 };
 
@@ -87,17 +80,15 @@ const listConnections = async (req, res) => {
   try {
     const user = await User.findById(req.user._id).populate(
       "connections",
-      "name email profilePic"
+      "name email profilePic role"
     );
 
-    res.json({
-      success: true,
-      count: user.connections.length,
+    res.status(200).json({
       connections: user.connections,
     });
   } catch (err) {
     console.error(err);
-    res.status(500).json({ success: false, message: "Server Error" });
+    res.status(500).json({ message: "Server Error" });
   }
 };
 
@@ -105,17 +96,37 @@ const listConnections = async (req, res) => {
 const listConnectionRequests = async (req, res) => {
   try {
     const user = await User.findById(req.user._id)
-      .populate("connectionRequests", "name email role profilePic")
+      .populate("connectionRequests", "name email profilePic role")
       .select("connectionRequests");
 
-    res.json({
-      success: true,
-      count: user.connectionRequests.length,
+    res.status(200).json({
       requests: user.connectionRequests,
     });
   } catch (err) {
     console.error(err);
-    res.status(500).json({ success: false, message: "Server Error" });
+    res.status(500).json({ message: "Server Error" });
+  }
+};
+
+// Search users by name
+const searchUsersByName = async (req, res) => {
+  try {
+    const { name } = req.query; // Get search query from query params
+
+    if (!name || name.trim() === "") {
+      return res.status(400).json({ message: "Search query is required" });
+    }
+
+    // Case-insensitive, partial match
+    const users = await User.find({
+      name: { $regex: name, $options: "i" },
+      _id: { $ne: req.user._id }, // Exclude the searching user
+    }).select("name email profilePic role"); // Select fields to return
+
+    res.status(200).json({ users });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Server Error" });
   }
 };
 
@@ -125,4 +136,5 @@ module.exports = {
   rejectConnectionRequest,
   listConnections,
   listConnectionRequests,
+  searchUsersByName,
 };
