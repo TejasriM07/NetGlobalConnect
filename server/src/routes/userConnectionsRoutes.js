@@ -7,6 +7,7 @@ const {
   rejectConnectionRequest,
   listConnections,
   listConnectionRequests,
+  searchUsersByName,
 } = require("../controllers/userConnectionsController");
 
 // Send request
@@ -23,5 +24,8 @@ router.get("/connections", protect, listConnections);
 
 // List pending requests
 router.get("/requests", protect, listConnectionRequests);
+
+// Search users by name
+router.get("/search", protect, searchUsersByName);
 
 module.exports = router;
