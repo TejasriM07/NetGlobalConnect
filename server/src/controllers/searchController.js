@@ -6,9 +6,6 @@ const Job = require("../models/Job");
 const unifiedSearch = async (req, res) => {
   try {
     const { q, type, sortBy, role } = req.query;
-    // type: "users" | "posts" | "jobs" | undefined (all)
-    // sortBy: "date" | "likes" | "comments"
-    // role: "JobSeeker" | "Employee" (for user filter)
 
     if (!q || q.trim() === "") {
       return res.status(400).json({ message: "Search query is required" });
@@ -23,6 +20,7 @@ const unifiedSearch = async (req, res) => {
         name: searchRegex,
         _id: { $ne: req.user._id },
       };
+
       if (role) userFilter.role = role; // filter by role if provided
 
       let userQuery = User.find(userFilter).select(
@@ -38,6 +36,12 @@ const unifiedSearch = async (req, res) => {
 
     // ===== Posts =====
     if (!type || type === "posts") {
+      // Populate 'userId' instead of 'author'
+      let postQuery = Post.find({ content: searchRegex }).populate(
+        "userId",
+        "name email profilePic role"
+      );
+
       let postQuery = Post.find({ content: searchRegex }).populate(
         "author",
         "name email profilePic role"
