@@ -20,7 +20,8 @@ const unifiedSearch = async (req, res) => {
         name: searchRegex,
         _id: { $ne: req.user._id },
       };
-      if (role) userFilter.role = role;
+
+      if (role) userFilter.role = role; // filter by role if provided
 
       let userQuery = User.find(userFilter).select(
         "name email profilePic role"
@@ -41,6 +42,12 @@ const unifiedSearch = async (req, res) => {
         "name email profilePic role"
       );
 
+      let postQuery = Post.find({ content: searchRegex }).populate(
+        "author",
+        "name email profilePic role"
+      );
+
+      // Sorting
       if (sortBy === "date") {
         postQuery = postQuery.sort({ createdAt: -1 });
       } else if (sortBy === "likes") {
