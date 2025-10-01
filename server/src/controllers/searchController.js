@@ -42,10 +42,7 @@ const unifiedSearch = async (req, res) => {
         "name email profilePic role"
       );
 
-      let postQuery = Post.find({ content: searchRegex }).populate(
-        "author",
-        "name email profilePic role"
-      );
+     
 
       // Sorting
       if (sortBy === "date") {
