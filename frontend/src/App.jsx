@@ -11,9 +11,9 @@ import Feed from "./pages/Feed";
 import UserProfile from "./components/UserProfile";
 import ChatPage from "./components/ChatPage";
 import MessagesList from "./components/MessagesList";
-import CreateJob from "./jobs/CreateJob";
 import JobList from "./jobs/JobList";
 import ApplicantsList from "./jobs/ApplicantsList";
+import SearchResults from "./pages/SearchResult";
 
 export default function App() {
   return (
@@ -32,6 +32,14 @@ export default function App() {
             </PrivateRoute>
           }
         />
+        <Route
+    path="/search-results"
+    element={
+      <PrivateRoute>
+        <SearchResults />
+      </PrivateRoute>
+    }
+  />
         <Route
           path="/edit-profile"
           element={
@@ -74,14 +82,6 @@ export default function App() {
           element={
             <PrivateRoute>
               <Feed />
-            </PrivateRoute>
-          }
-        />
-        <Route
-          path="/create-job"
-          element={
-            <PrivateRoute>
-              <CreateJob />
             </PrivateRoute>
           }
         />

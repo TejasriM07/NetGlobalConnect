@@ -3,11 +3,10 @@ const User = require("../models/User");
 const generateToken = require("../utils/generateToken");
 const { uploadStream } = require("../utils/cloudinary");
 
-// Register user (optional profile image)
+// --- Register user ---
 const register = async (req, res) => {
   try {
     const { name, email, password, role } = req.body;
-
     if (!name || !email || !password) {
       return res.status(400).json({
         success: false,
@@ -22,7 +21,7 @@ const register = async (req, res) => {
       return res.status(400).json({
         success: false,
         message:
-          "Password must be at least 8 characters long, include uppercase, lowercase, number, and special character",
+          "Password must be at least 8 characters, include uppercase, lowercase, number, special char",
       });
     }
 
@@ -34,7 +33,7 @@ const register = async (req, res) => {
 
     let profile = null;
     if (req.file && req.file.buffer) {
-      const uploadRes = await uploadStream(req.file.buffer); // Upload to Cloudinary
+      const uploadRes = await uploadStream(req.file.buffer);
       profile = { url: uploadRes.secure_url, publicId: uploadRes.public_id };
     }
 
@@ -61,8 +60,7 @@ const register = async (req, res) => {
   }
 };
 
-
-// Login
+// --- Login user ---
 const login = async (req, res) => {
   try {
     const { email, password } = req.body;
@@ -94,7 +92,7 @@ const login = async (req, res) => {
   }
 };
 
-// Google OAuth login
+// --- Google OAuth login ---
 const oauthLogin = async (req, res) => {
   try {
     if (!req.userDoc)
@@ -107,8 +105,9 @@ const oauthLogin = async (req, res) => {
       role: userDoc.role,
     });
 
-    const frontend = process.env.FRONTEND_URL || "http://localhost:3000";
-    const redirectUrl = `${frontend}/oauth-success?token=${token}`;
+    // 🔹 Redirect to frontend login page (existing Login.jsx handles ?token)
+    const frontend = process.env.FRONTEND_URL || "http://localhost:5173";
+    const redirectUrl = `${frontend}/login?token=${token}`;
     return res.redirect(redirectUrl);
   } catch (err) {
     console.error("OAuth callback error", err);
