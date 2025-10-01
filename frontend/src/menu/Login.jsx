@@ -1,17 +1,43 @@
-// src/pages/Login.jsx
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { SiGoogle } from "react-icons/si";
-import { loginUser, googleLogin, getProfile } from "../api";
+import { loginUser, getProfile, setAuthToken } from "../api";
 import { useNavigate } from "react-router-dom";
+
 export default function Login() {
-    const [form, setForm] = useState({
-        email: "",
-        password: "",
-    });
+    const [form, setForm] = useState({ email: "", password: "" });
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState("");
 
     const navigate = useNavigate();
+
+    // --- Handle token from Google redirect ---
+    useEffect(() => {
+        console.log("Login page loaded");
+        const params = new URLSearchParams(window.location.search);
+        const token = params.get("token");
+        console.log("URL token:", token);
+
+        if (token) {
+            console.log("Google login token detected, setting auth...");
+            setLoading(true);
+            setAuthToken(token);
+
+            getProfile()
+                .then((res) => {
+                    const meData = res.data?.data || res.data;
+                    if (meData) {
+                        localStorage.setItem("userRole", meData.role || "");
+                        localStorage.setItem("userId", meData._id || meData.id || "");
+                    }
+                    navigate("/profile");
+                })
+                .catch((err) => {
+                    navigate("/profile");
+                })
+                .finally(() => setLoading(false));
+        }
+    }, [navigate]);
+
     const handleChange = (e) => {
         const { name, value } = e.target;
         setForm((s) => ({ ...s, [name]: value }));
@@ -24,9 +50,9 @@ export default function Login() {
 
         try {
             const res = await loginUser(form);
-            localStorage.setItem("token", res.data.token);
+            const token = res.data.token;
+            setAuthToken(token);
 
-            // fetch profile to store role and id locally so other pages can rely on it
             try {
                 const me = await getProfile();
                 const meData = me.data?.data || me.data;
@@ -35,20 +61,21 @@ export default function Login() {
                     localStorage.setItem("userId", meData._id || meData.id || "");
                 }
             } catch (err) {
-                // non-fatal — still redirect to profile
                 console.warn("Failed to fetch profile after login", err);
             }
 
-            // Notify app about auth change
-            try { window.dispatchEvent(new Event("authchange")); } catch {}
-
-            // Redirect to profile after successful login
             navigate("/profile");
         } catch (err) {
+            console.error("Login error:", err);
             setError(err.response?.data?.message || "Something went wrong");
         } finally {
             setLoading(false);
         }
+    };
+
+    const handleGoogleLogin = () => {
+        console.log("Redirecting to Google OAuth...");
+        window.location.href = "https://netglobalconnect.onrender.com/api/auth/google";
     };
 
     return (
@@ -74,7 +101,6 @@ export default function Login() {
                             required
                             className="w-full px-3 py-2 rounded-lg bg-[#01020a] border-2 border-purple-600/40 focus:outline-none focus:ring-2 focus:ring-purple-500 text-white placeholder:text-slate-400"
                         />
-
                         <input
                             type="password"
                             name="password"
@@ -84,7 +110,6 @@ export default function Login() {
                             required
                             className="w-full px-3 py-2 rounded-lg bg-[#01020a] border-2 border-red-600/40 focus:outline-none focus:ring-2 focus:ring-red-500 text-white placeholder:text-slate-400"
                         />
-
                         <button
                             type="submit"
                             disabled={loading}
@@ -95,7 +120,7 @@ export default function Login() {
                     </form>
 
                     <button
-                        onClick={googleLogin}
+                        onClick={handleGoogleLogin}
                         className="mt-3 w-full py-3 rounded-lg font-semibold text-black bg-white hover:bg-gray-200 transition flex justify-center items-center gap-2"
                     >
                         <SiGoogle className="w-5 h-5" />

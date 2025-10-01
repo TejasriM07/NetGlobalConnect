@@ -3,7 +3,7 @@ import axios from "axios";
 
 // --- Axios instance ---
 const API = axios.create({
-    baseURL: "http://localhost:5000/api",
+  baseURL: "https://netglobalconnect.onrender.com/api",
 });
 
 // Automatically attach token if exists
@@ -33,7 +33,10 @@ export const registerUser = (formData) =>
 export const loginUser = (data) => API.post("/auth/login", data);
 
 export const googleLogin = () => {
-    window.open("http://localhost:5000/api/auth/google", "_self");
+    window.open(
+      "https://netglobalconnect.onrender.com/api/auth/google",
+      "_self"
+    );
 };
 
 // --- Profile ---
