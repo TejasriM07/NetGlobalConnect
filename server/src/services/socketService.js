@@ -29,7 +29,7 @@ const initSocket = (server) => {
     console.log("User connected:", socket.user.email);
 
     socket.on("join", (userId) => {
-      socket.join(userId); // join room = userId
+      socket.join(userId); 
     });
 
     socket.on("private_message", async ({ content, to }) => {

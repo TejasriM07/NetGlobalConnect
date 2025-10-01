@@ -6,13 +6,15 @@ import {
   getConnections,
   respondToConnectionRequest
 } from "../api";
-import { User, Briefcase, Star, Users, Mail, Edit3 } from "lucide-react";
+import { User, Briefcase, Star, Users, Mail, Edit3, X } from "lucide-react";
+import defaultAvatar from "../assets/default.jpeg";
 
 export default function Profile() {
   const [profile, setProfile] = useState(null);
   const [connectionRequests, setConnectionRequests] = useState([]);
   const [connections, setConnections] = useState([]);
   const [message, setMessage] = useState("");
+  const [showConnections, setShowConnections] = useState(false);
   const navigate = useNavigate();
 
   // Fetch profile info
@@ -72,7 +74,7 @@ export default function Profile() {
           <div className="flex flex-col items-center text-center">
             <div className="w-32 h-32 rounded-full border-4 border-cyan-400 shadow-lg overflow-hidden">
               <img
-                src={profile.profilePic?.url || "/default-avatar.png"}
+                src={profile.profilePic?.url || defaultAvatar}
                 alt="Profile"
                 className="w-full h-full object-cover"
               />
@@ -83,7 +85,10 @@ export default function Profile() {
 
           {/* Stats */}
           <div className="mt-6 space-y-3">
-            <div className="flex items-center gap-3 p-3 rounded-xl bg-[#1a1a2f]/70">
+            <div
+              className="flex items-center gap-3 p-3 rounded-xl bg-[#1a1a2f]/70 cursor-pointer hover:bg-[#1a1a2f]"
+              onClick={() => setShowConnections(true)}
+            >
               <Users className="text-purple-400" size={20} />
               <span className="flex-1">Connections</span>
               <span className="font-bold">{connections.length}</span>
@@ -227,7 +232,8 @@ export default function Profile() {
                 {connections.map((conn) => (
                   <span
                     key={conn._id}
-                    className="px-3 py-1 rounded-lg bg-green-500/20 border border-green-500/40 text-green-300 text-sm hover:bg-green-500/40 transition"
+                    className="px-3 py-1 rounded-lg bg-green-500/20 border border-green-500/40 text-green-300 text-sm hover:bg-green-500/40 transition cursor-pointer"
+                    onClick={() => setShowConnections(true)}
                   >
                     {conn.name || conn.email || "Unknown User"}
                   </span>
@@ -239,6 +245,44 @@ export default function Profile() {
           </div>
         </div>
       </div>
+
+      {/* Connections Modal */}
+      {showConnections && (
+        <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50">
+          <div className="bg-[#11121f] p-6 rounded-2xl w-[90%] max-w-lg border border-green-400/40 shadow-xl relative">
+            <button
+              className="absolute top-3 right-3 text-gray-400 hover:text-white"
+              onClick={() => setShowConnections(false)}
+            >
+              <X size={22} />
+            </button>
+            <h2 className="text-green-400 text-xl font-bold mb-4 flex items-center gap-2">
+              <Users size={20} /> Your Connections
+            </h2>
+            {connections.length > 0 ? (
+              <div className="space-y-3 max-h-[60vh] overflow-y-auto">
+                {connections.map((conn) => (
+                  <div
+                    key={conn._id}
+                    className="flex items-center gap-3 p-3 bg-[#1a1a2f]/70 rounded-xl"
+                  >
+                    <img
+                      src={conn.profilePic?.url || defaultAvatar}
+                      alt={conn.name}
+                      className="w-10 h-10 rounded-full object-cover border border-green-400/40"
+                    />
+                    <p className="text-slate-200 font-semibold">
+                      {conn.name || conn.email || "Unknown User"}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <p className="text-slate-400">No connections yet</p>
+            )}
+          </div>
+        </div>
+      )}
 
       {message && (
         <p className="text-cyan-400 mt-6 text-center absolute bottom-4 w-full">
