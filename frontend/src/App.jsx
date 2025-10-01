@@ -10,7 +10,6 @@ import ProfileForm from "./components/ProfileForm";
 import PrivateRoute from "./menu/PrivateRoute";
 import Feed from "./pages/Feed";
 import Landing from "./pages/Landing";
-import OAuthSuccess from "./pages/OAuthSuccess";
 import UserProfile from "./components/UserProfile";
 import ChatPage from "./components/ChatPage";
 import MessagesList from "./components/MessagesList";
@@ -29,7 +28,6 @@ export default function App() {
       <Routes>
         <Route path="/signup" element={<Signup />} />
         <Route path="/login" element={<Login />} />
-        <Route path="/oauth-success" element={<OAuthSuccess />} />
 
         {/* Protected routes */}
         <Route
@@ -40,6 +38,7 @@ export default function App() {
             </PrivateRoute>
           }
         />
+        <Route path="/search-results" element={<PrivateRoute><SearchResults /></PrivateRoute>} />
         <Route
     path="/search-results"
     element={
@@ -119,6 +118,7 @@ export default function App() {
             </PrivateRoute>
           }
         />
+
 
         <Route path="/jobs/:jobId/applicants" element={
           <PrivateRoute>

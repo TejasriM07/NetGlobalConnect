@@ -65,6 +65,7 @@ export default function Login() {
             try { window.dispatchEvent(new Event("authchange")); } catch {}
             navigate("/profile");
         } catch (err) {
+            console.error("Login error:", err);
             setError(err.response?.data?.message || "Something went wrong");
         } finally {
             setLoading(false);

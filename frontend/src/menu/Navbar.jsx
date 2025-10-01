@@ -49,19 +49,13 @@ export default function Navbar() {
     localStorage.clear();
     setIsLoggedIn(false);
     navigate("/login");
-    try { window.dispatchEvent(new Event("authchange")); } catch {}
   };
 
-  const baseLink = "px-3 py-2 rounded-md transition-colors";
-  const active = "text-cyan-400";
-  const inactive = "text-gray-300 hover:text-white";
-
-  useEffect(() => {
-    const onScroll = () => setHasScrolled(window.scrollY > 4);
-    onScroll();
-    window.addEventListener("scroll", onScroll, { passive: true });
-    return () => window.removeEventListener("scroll", onScroll);
-  }, []);
+  const handleSearch = (e) => {
+    e.preventDefault();
+    if (!searchQuery.trim()) return;
+    navigate("/search-results", { state: { query: searchQuery } });
+  };
 
   const handleSearch = (e) => {
     e.preventDefault();
@@ -108,7 +102,7 @@ export default function Navbar() {
                 </NavLink>
                 <NavLink to="/signup" className={({ isActive }) => `${baseLink} ${isActive ? active : inactive}`}>
                   Signup
-                </NavLink>
+                </Link>
               </>
             ) : (
               <>
@@ -124,7 +118,8 @@ export default function Navbar() {
                 <NavLink to="/messages" className={({ isActive }) => `${baseLink} ${isActive ? active : inactive}`}>
                   Inbox
                 </NavLink>
-                <button onClick={handleLogout} className="ml-2 px-3 py-2 rounded-md text-red-300 hover:text-white hover:bg-red-600/20">
+
+                <button onClick={handleLogout} className="hover:text-red-400">
                   Logout
                 </button>
               </>

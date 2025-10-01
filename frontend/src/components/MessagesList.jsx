@@ -8,7 +8,7 @@ export default function MessagesList() {
 
   
   const BACKEND_URL =
-    import.meta.env.VITE_BACKEND_URL || "http://localhost:5000";
+    import.meta.env.VITE_BACKEND_URL || "https://netglobalconnect.onrender.com";
 
   const token = localStorage.getItem("token");
 

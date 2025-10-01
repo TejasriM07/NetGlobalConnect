@@ -16,7 +16,7 @@ export default function ChatPage() {
     const messagesEndRef = useRef(null);
     const socketRef = useRef(null);
 
-    const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || "http://localhost:5000";
+    const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || "https://netglobalconnect.onrender.com";
     const token = localStorage.getItem("token");
 
     // Scroll to bottom
