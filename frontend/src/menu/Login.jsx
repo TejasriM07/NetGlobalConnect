@@ -39,6 +39,9 @@ export default function Login() {
                 console.warn("Failed to fetch profile after login", err);
             }
 
+            // Notify app about auth change
+            try { window.dispatchEvent(new Event("authchange")); } catch {}
+
             // Redirect to profile after successful login
             navigate("/profile");
         } catch (err) {

@@ -2,12 +2,15 @@
 import React from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Navbar from "./menu/Navbar";
+import Footer from "./components/Footer";
 import Signup from "./menu/Signup";
 import Login from "./menu/Login";
 import Profile from "./components/Profile";
 import ProfileForm from "./components/ProfileForm";
 import PrivateRoute from "./menu/PrivateRoute";
 import Feed from "./pages/Feed";
+import Landing from "./pages/Landing";
+import OAuthSuccess from "./pages/OAuthSuccess";
 import UserProfile from "./components/UserProfile";
 import ChatPage from "./components/ChatPage";
 import MessagesList from "./components/MessagesList";
@@ -22,6 +25,7 @@ export default function App() {
       <Routes>
         <Route path="/signup" element={<Signup />} />
         <Route path="/login" element={<Login />} />
+        <Route path="/oauth-success" element={<OAuthSuccess />} />
 
         {/* Protected routes */}
         <Route
@@ -69,14 +73,8 @@ export default function App() {
           }
         />
 
-        <Route
-          path="/"
-          element={
-            <PrivateRoute>
-              <Feed />
-            </PrivateRoute>
-          }
-        />
+        <Route path="/" element={<Landing />} />
+        <Route path="/feed" element={<PrivateRoute><Feed /></PrivateRoute>} />
         <Route
           path="/create-job"
           element={
@@ -101,7 +99,7 @@ export default function App() {
           </PrivateRoute>
         } />
       </Routes>
-
+      <Footer />
     </Router>
   );
 }
