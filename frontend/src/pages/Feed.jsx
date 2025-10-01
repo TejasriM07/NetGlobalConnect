@@ -1,5 +1,6 @@
 // src/components/Feed.jsx
 import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import {
   getProfile,
   createPost,
@@ -11,6 +12,7 @@ import {
 import defaultAvatar from "../assets/default.jpeg";
 
 export default function Feed() {
+  const navigate = useNavigate();
   const [allPosts, setAllPosts] = useState([]);
   const [userId, setUserId] = useState(null);
   const [connections, setConnections] = useState([]);
@@ -31,7 +33,6 @@ export default function Feed() {
         setConnections(res.data.data.connections || []);
       }
     } catch (err) {
-      console.error("❌ Error fetching profile:", err);
     }
   };
 
@@ -43,7 +44,6 @@ export default function Feed() {
       const fetched = (res.data?.posts || []).slice().reverse();
       setAllPosts(fetched);
     } catch (err) {
-      console.error("❌ Error fetching posts:", err);
     } finally {
       setPostsLoading(false);
     }
@@ -83,7 +83,6 @@ export default function Feed() {
       setPreviewUrl(null);
       fetchFeedPosts();
     } catch (err) {
-      console.error("❌ Error creating post:", err);
     } finally {
       setLoading(false);
     }
@@ -134,19 +133,15 @@ export default function Feed() {
       await likePost(postId);
       fetchFeedPosts();
     } catch (err) {
-      console.error("❌ Error liking post:", err);
     }
   };
 
   // Report
 const handleReport = async (postId) => {
-  console.log("🔹 Reporting post:", postId);
   try {
-    const res = await reportPost(postId); // assign to res
-    console.log("✅ Report response:", res.data); // now res is defined
+    await reportPost(postId);
     fetchFeedPosts();
   } catch (err) {
-    console.error("❌ Error reporting post:", err);
   }
 };
 
@@ -157,13 +152,13 @@ const handleReport = async (postId) => {
       await commentPost(postId, text);
       fetchFeedPosts();
     } catch (err) {
-      console.error("❌ Error commenting:", err);
     }
   };
 
   return (
     <div className="min-h-screen w-full bg-neutral-950 text-gray-100">
       <div className="max-w-2xl mx-auto p-4">
+        
         {/* Create Post */}
         <div className="bg-black border border-gray-800 rounded-2xl p-4 mb-6 shadow-lg">
           <form onSubmit={handleCreatePost} className="space-y-3">
@@ -254,7 +249,7 @@ const handleReport = async (postId) => {
               <div className="flex items-center mb-3">
                 <img
                   src={post.userId?.profilePic?.url || "/default-avatar.svg"}
-                  src={post.userId?.profilePic?.url || defaultAvatar}
+                 
                   alt="User"
                   className="w-11 h-11 rounded-full mr-3 border border-gray-700 object-cover"
                 />

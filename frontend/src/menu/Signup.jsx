@@ -50,9 +50,9 @@ export default function Signup() {
           localStorage.setItem("userId", meData._id || meData.id || "");
         }
       } catch (err) {
-        console.warn("Failed to fetch profile after signup", err);
       }
 
+      try { window.dispatchEvent(new Event("authchange")); } catch {}
       // redirect to profile
       navigate("/profile");
     } catch (err) {

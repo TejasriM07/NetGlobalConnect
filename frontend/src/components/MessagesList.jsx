@@ -6,7 +6,7 @@ import axios from "axios";
 export default function MessagesList() {
   const [conversations, setConversations] = useState([]);
 
-  // ✅ Only use Vite-style env variables
+  
   const BACKEND_URL =
     import.meta.env.VITE_BACKEND_URL || "http://localhost:5000";
 
@@ -22,7 +22,6 @@ export default function MessagesList() {
           setConversations(res.data.data || []);
         }
       } catch (err) {
-        console.error("Failed to load conversations:", err);
       }
     };
 

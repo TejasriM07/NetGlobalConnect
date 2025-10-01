@@ -16,6 +16,7 @@ export default function Profile() {
   const [message, setMessage] = useState("");
   const [showConnections, setShowConnections] = useState(false);
   const navigate = useNavigate();
+  const isAdmin = (profile?.role === "Admin") || (localStorage.getItem("userRole") === "Admin");
 
   // Fetch profile info
   const fetchProfileData = async () => {
@@ -23,7 +24,6 @@ export default function Profile() {
       const res = await getProfile();
       setProfile(res.data?.data || null);
     } catch (err) {
-      console.error(err);
       setMessage("Failed to load profile.");
     }
   };
@@ -36,13 +36,11 @@ export default function Profile() {
         getConnections()
       ]);
 
-      console.log("Requests from backend:", reqRes.data.requests);
-      console.log("Connections from backend:", connRes.data);
+      
 
       setConnectionRequests(reqRes.data.requests || []);
       setConnections(connRes.data.connections || connRes.data.data || []);
     } catch (err) {
-      console.error(err);
       setMessage("Failed to load requests/connections.");
     }
   };
@@ -59,7 +57,6 @@ export default function Profile() {
       setMessage(`Request ${action}ed successfully`);
       fetchRequestsAndConnections(); // Refresh data
     } catch (err) {
-      console.error(err);
       setMessage(`Failed to ${action} request`);
     }
   };
@@ -285,6 +282,32 @@ export default function Profile() {
             ) : (
               <p className="text-slate-400 text-sm">No connections yet</p>
             )}
+          </div>
+
+        { }
+          <div className="bg-[#11121f]/80 rounded-3xl p-6 border border-[#7c3aed]/30 shadow-inner">
+            <h3 className="text-cyan-400 font-bold mb-3 flex items-center gap-2">
+              Quick Actions
+            </h3>
+            <div className="flex gap-2">
+            {isAdmin ? (
+                <button
+                  type="button"
+                  onClick={() => navigate("/reported-posts")}
+                  className="px-3 py-2 rounded-lg text-sm border border-rose-600 text-rose-300 hover:bg-rose-600/10"
+                >
+                  Reported Posts
+                </button>
+              ) : (
+                <button
+                  type="button"
+                  onClick={() => navigate("/my-reported-posts")}
+                  className="px-3 py-2 rounded-lg text-sm border border-amber-600 text-amber-300 hover:bg-amber-600/10"
+                >
+                  My Reported Posts
+                </button>
+              )}
+            </div>
           </div>
         </div>
       </div>

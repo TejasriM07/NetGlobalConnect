@@ -49,7 +49,6 @@ export default function EditProfile() {
           setMessage("Profile not found.");
         }
       } catch (err) {
-        console.error(err);
         setMessage("Failed to load profile. Make sure you are logged in.");
       } finally {
         setLoading(false);
@@ -69,7 +68,7 @@ export default function EditProfile() {
     }
   };
 
-  // Resize/compress image to keep payload small for JSON update
+  // Resize/compress image to keep payload small !!!
   const downscaleImageToDataURL = (file, maxSide = 256, quality = 0.7) => {
     return new Promise((resolve, reject) => {
       const img = new Image();
@@ -99,7 +98,7 @@ export default function EditProfile() {
     });
   };
 
-  // Handle file upload -> compress and store Data URL (frontend-only)
+  // Handle file upload -> compress and store Data URL 
   const handleFile = async (file) => {
     if (!file) return;
     const isImage = file.type.startsWith("image/");
@@ -108,7 +107,7 @@ export default function EditProfile() {
       return;
     }
     try {
-      // Downscale to keep JSON body small (<= ~200KB target)
+      // Downscale to keep JSON body small (<= ~200KB target) !!!
       const dataUrl = await downscaleImageToDataURL(file, 300, 0.7);
       const approxBytes = Math.ceil((dataUrl.length * 3) / 4); // base64 size estimate
       if (approxBytes > 220 * 1024) {
@@ -170,7 +169,6 @@ export default function EditProfile() {
         setTimeout(() => navigate("/profile"), 1000);
       }
     } catch (err) {
-      console.error(err);
       setMessage(err.response?.data?.message || "Failed to update profile.");
     }
   };

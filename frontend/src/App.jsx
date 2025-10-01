@@ -17,11 +17,15 @@ import MessagesList from "./components/MessagesList";
 import JobList from "./jobs/JobList";
 import ApplicantsList from "./jobs/ApplicantsList";
 import SearchResults from "./pages/SearchResult";
+import ReportedPosts from "./pages/ReportedPosts";
+import MyReportedPosts from "./pages/MyReportedPosts";
 
 export default function App() {
   return (
     <Router>
-      <Navbar />
+      <div className="min-h-screen flex flex-col bg-neutral-950">
+        <Navbar />
+        <main className="flex-1">
       <Routes>
         <Route path="/signup" element={<Signup />} />
         <Route path="/login" element={<Login />} />
@@ -81,11 +85,28 @@ export default function App() {
           }
         />
 
+        <Route path="/" element={<Landing />} />
         <Route
-          path="/"
+          path="/feed"
           element={
             <PrivateRoute>
               <Feed />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/reported-posts"
+          element={
+            <PrivateRoute>
+              <ReportedPosts />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/my-reported-posts"
+          element={
+            <PrivateRoute>
+              <MyReportedPosts />
             </PrivateRoute>
           }
         />
@@ -105,7 +126,9 @@ export default function App() {
           </PrivateRoute>
         } />
       </Routes>
-      <Footer />
+        </main>
+        <Footer />
+      </div>
     </Router>
   );
 }

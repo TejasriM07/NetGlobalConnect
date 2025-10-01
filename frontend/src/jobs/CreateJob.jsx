@@ -44,7 +44,6 @@ export default function CreateJob() {
                 });
             }
         } catch (err) {
-            console.error(err);
             setMessage("❌ Failed to create job. Please try again.");
         }
     };

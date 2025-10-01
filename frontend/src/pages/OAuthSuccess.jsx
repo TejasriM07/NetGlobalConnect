@@ -19,10 +19,10 @@ export default function OAuthSuccess() {
       }
 
       try {
-        // persist token and prime axios
+       
         setAuthToken(token);
 
-        // fetch profile and persist basic fields for downstream pages
+        
         try {
           const me = await getProfile();
           const meData = me.data?.data || me.data;
@@ -31,8 +31,7 @@ export default function OAuthSuccess() {
             localStorage.setItem("userId", meData._id || meData.id || "");
           }
         } catch (e) {
-          // profile fetch failure shouldn't block login
-          // proceed to app regardless
+          
         }
 
         // let the app know auth state changed

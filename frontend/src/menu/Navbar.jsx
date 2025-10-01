@@ -34,10 +34,14 @@ export default function Navbar() {
     window.addEventListener("storage", onStorage);
     window.addEventListener("focus", onFocus);
 
+    // also observe URL changes to update nav without hard refresh
+    const unlisten = () => {};
+
     return () => {
       window.removeEventListener("authchange", onAuthChange);
       window.removeEventListener("storage", onStorage);
       window.removeEventListener("focus", onFocus);
+      unlisten();
     };
   }, []);
 
@@ -71,7 +75,7 @@ export default function Navbar() {
       <div className="max-w-6xl mx-auto px-4">
         <div className="flex h-14 items-center justify-between">
           <div className="flex items-center gap-3">
-            <NavLink to="/" className="font-bold text-xl tracking-tight">
+            <NavLink to={isLoggedIn ? "/feed" : "/"} className="font-bold text-xl tracking-tight">
               NetGlobalConnect
             </NavLink>
           </div>

@@ -17,7 +17,6 @@ export default function ApplicantsList() {
             setApplicants(res.data.job.applicants || []);
             setJobTitle(res.data.job.title);
         } catch (err) {
-            console.error(err);
             setError("Failed to fetch applicants");
         } finally {
             setLoading(false);
