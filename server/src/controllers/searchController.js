@@ -36,11 +36,7 @@ const unifiedSearch = async (req, res) => {
 
     // ===== Posts =====
     if (!type || type === "posts") {
-      // Populate 'userId' with user details
-      let postQuery = Post.find({ content: searchRegex }).populate(
-        "userId",
-        "name email profilePic role"
-      );
+      // Populate 'userId' instead of 'author'
 
       // Sorting
       if (sortBy === "date") {

@@ -8,6 +8,7 @@ import {
   commentPost,
   getAllPosts,
 } from "../api";
+import defaultAvatar from "../assets/default.jpeg";
 
 export default function Feed() {
   const [allPosts, setAllPosts] = useState([]);
@@ -138,14 +139,17 @@ export default function Feed() {
   };
 
   // Report
-  const handleReport = async (postId) => {
-    try {
-      await reportPost(postId);
-      fetchFeedPosts();
-    } catch (err) {
-      console.error("❌ Error reporting post:", err);
-    }
-  };
+const handleReport = async (postId) => {
+  console.log("🔹 Reporting post:", postId);
+  try {
+    const res = await reportPost(postId); // assign to res
+    console.log("✅ Report response:", res.data); // now res is defined
+    fetchFeedPosts();
+  } catch (err) {
+    console.error("❌ Error reporting post:", err);
+  }
+};
+
 
   // Comment
   const handleComment = async (postId, text) => {
@@ -250,6 +254,7 @@ export default function Feed() {
               <div className="flex items-center mb-3">
                 <img
                   src={post.userId?.profilePic?.url || "/default-avatar.svg"}
+                  src={post.userId?.profilePic?.url || defaultAvatar}
                   alt="User"
                   className="w-11 h-11 rounded-full mr-3 border border-gray-700 object-cover"
                 />

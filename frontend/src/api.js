@@ -73,6 +73,7 @@ export const getAllPosts = () => API.get("/posts");
 export const createPost = (formData) => API.post(`/posts`, formData, { headers: { "Content-Type": "multipart/form-data" } });
 export const likePost = (postId) => API.post(`/posts/${postId}/like`);
 export const reportPost = (postId) => API.post(`/posts/${postId}/report`);
+export const getReportedPosts = () => API.get("/posts/reported");
 export const commentPost = (postId, text) => API.post(`/posts/${postId}/comment`, { text });
 
 // --- Jobs / Applicants ---
