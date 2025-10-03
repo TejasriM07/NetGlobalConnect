@@ -36,20 +36,16 @@ const unifiedSearch = async (req, res) => {
 
     // ===== Posts =====
     if (!type || type === "posts") {
-      // Populate 'userId' instead of 'author'
+      let postQuery = Post.find({
+        $or: [
+          { content: searchRegex },
+        ],
+      })
+        .populate("userId", "name email")
+        .populate("comments.userId", "name email");
 
-      let postQuery = Post.find({ content: searchRegex }).populate(
-        "author",
-        "name email profilePic role"
-      );
-
-      // Sorting
       if (sortBy === "date") {
         postQuery = postQuery.sort({ createdAt: -1 });
-      } else if (sortBy === "likes") {
-        postQuery = postQuery.sort({ likesCount: -1 });
-      } else if (sortBy === "comments") {
-        postQuery = postQuery.sort({ commentsCount: -1 });
       }
 
       response.posts = await postQuery;

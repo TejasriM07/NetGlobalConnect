@@ -2,23 +2,29 @@
 import React from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Navbar from "./menu/Navbar";
+import Footer from "./components/Footer";
 import Signup from "./menu/Signup";
 import Login from "./menu/Login";
 import Profile from "./components/Profile";
 import ProfileForm from "./components/ProfileForm";
 import PrivateRoute from "./menu/PrivateRoute";
 import Feed from "./pages/Feed";
+import Landing from "./pages/Landing";
 import UserProfile from "./components/UserProfile";
 import ChatPage from "./components/ChatPage";
 import MessagesList from "./components/MessagesList";
 import JobList from "./jobs/JobList";
 import ApplicantsList from "./jobs/ApplicantsList";
 import SearchResults from "./pages/SearchResult";
+import ReportedPosts from "./pages/ReportedPosts";
+import MyReportedPosts from "./pages/MyReportedPosts";
 
 export default function App() {
   return (
     <Router>
-      <Navbar />
+      <div className="min-h-screen flex flex-col bg-neutral-950">
+        <Navbar />
+        <main className="flex-1">
       <Routes>
         <Route path="/signup" element={<Signup />} />
         <Route path="/login" element={<Login />} />
@@ -32,6 +38,7 @@ export default function App() {
             </PrivateRoute>
           }
         />
+        <Route path="/search-results" element={<PrivateRoute><SearchResults /></PrivateRoute>} />
         <Route
     path="/search-results"
     element={
@@ -77,11 +84,28 @@ export default function App() {
           }
         />
 
+        <Route path="/" element={<Landing />} />
         <Route
-          path="/"
+          path="/feed"
           element={
             <PrivateRoute>
               <Feed />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/reported-posts"
+          element={
+            <PrivateRoute>
+              <ReportedPosts />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/my-reported-posts"
+          element={
+            <PrivateRoute>
+              <MyReportedPosts />
             </PrivateRoute>
           }
         />
@@ -95,13 +119,16 @@ export default function App() {
           }
         />
 
+
         <Route path="/jobs/:jobId/applicants" element={
           <PrivateRoute>
             <ApplicantsList />
           </PrivateRoute>
         } />
       </Routes>
-
+        </main>
+        <Footer />
+      </div>
     </Router>
   );
 }

@@ -26,6 +26,7 @@ export default function EditProfile() {
   const [loading, setLoading] = useState(true);
   const [message, setMessage] = useState("");
   const [validPic, setValidPic] = useState(true);
+  const [localPreview, setLocalPreview] = useState("");
   const navigate = useNavigate();
 
   // Fetch current profile
@@ -48,7 +49,6 @@ export default function EditProfile() {
           setMessage("Profile not found.");
         }
       } catch (err) {
-        console.error(err);
         setMessage("Failed to load profile. Make sure you are logged in.");
       } finally {
         setLoading(false);
@@ -65,6 +65,60 @@ export default function EditProfile() {
     if (name === "profilePic") {
       const isValid = /\.(jpg|jpeg|png|gif|webp)$/i.test(value.trim());
       setValidPic(isValid || value.trim() === "");
+    }
+  };
+
+  // Resize/compress image to keep payload small !!!
+  const downscaleImageToDataURL = (file, maxSide = 256, quality = 0.7) => {
+    return new Promise((resolve, reject) => {
+      const img = new Image();
+      const reader = new FileReader();
+      reader.onload = () => {
+        img.onload = () => {
+          let { width, height } = img;
+          const scale = Math.min(1, maxSide / Math.max(width, height));
+          const canvas = document.createElement("canvas");
+          canvas.width = Math.round(width * scale);
+          canvas.height = Math.round(height * scale);
+          const ctx = canvas.getContext("2d");
+          if (!ctx) return reject(new Error("Canvas not supported"));
+          ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+          try {
+            const dataUrl = canvas.toDataURL("image/jpeg", quality);
+            resolve(dataUrl);
+          } catch (e) {
+            reject(e);
+          }
+        };
+        img.onerror = reject;
+        img.src = String(reader.result || "");
+      };
+      reader.onerror = reject;
+      reader.readAsDataURL(file);
+    });
+  };
+
+  // Handle file upload -> compress and store Data URL 
+  const handleFile = async (file) => {
+    if (!file) return;
+    const isImage = file.type.startsWith("image/");
+    if (!isImage) {
+      setMessage("Please select an image file.");
+      return;
+    }
+    try {
+      // Downscale to keep JSON body small (<= ~200KB target) !!!
+      const dataUrl = await downscaleImageToDataURL(file, 300, 0.7);
+      const approxBytes = Math.ceil((dataUrl.length * 3) / 4); // base64 size estimate
+      if (approxBytes > 220 * 1024) {
+        setMessage("Image too large after compression. Try a smaller image or paste a URL.");
+        return;
+      }
+      setForm((f) => ({ ...f, profilePic: String(dataUrl || "") }));
+      setLocalPreview(String(dataUrl || ""));
+      setValidPic(true);
+    } catch (e) {
+      setMessage("Failed to process image. Please try a different file.");
     }
   };
 
@@ -115,7 +169,6 @@ export default function EditProfile() {
         setTimeout(() => navigate("/profile"), 1000);
       }
     } catch (err) {
-      console.error(err);
       setMessage(err.response?.data?.message || "Failed to update profile.");
     }
   };
@@ -127,23 +180,34 @@ export default function EditProfile() {
       <h2 className="text-3xl font-bold text-center mb-6">Edit Profile</h2>
 
       <form onSubmit={handleSubmit} className="space-y-6 max-w-3xl mx-auto">
-        {/* Profile Picture URL */}
+        {/* Profile Picture: Upload or URL */}
         <div>
-          <label className="block text-cyan-400 font-bold mb-1">Profile Picture URL</label>
-          <input
-            type="text"
-            name="profilePic"
-            value={form.profilePic}
-            onChange={handleChange}
-            placeholder="https://res.cloudinary.com/.../image.png"
-            className={`w-full px-4 py-2 rounded-xl bg-[#11121f] border ${validPic ? "border-cyan-500" : "border-red-500"
-              } focus:ring-2 focus:ring-cyan-400 text-white`}
-          />
-          {form.profilePic && (
+          <label className="block text-cyan-400 font-bold mb-1">Profile Picture</label>
+          <div className="flex flex-col md:flex-row gap-3 md:items-center">
+            <label className="inline-flex items-center gap-2 cursor-pointer">
+              <input
+                type="file"
+                accept="image/*"
+                className="hidden"
+                onChange={(e) => handleFile(e.target.files?.[0])}
+              />
+              <span className="px-4 py-2 rounded-xl bg-[#11121f] border border-cyan-500 text-cyan-300 hover:bg-[#0d0e1a]">Upload Image (auto-compress)</span>
+            </label>
+            <span className="text-slate-400 text-sm">or</span>
+            <input
+              type="text"
+              name="profilePic"
+              value={form.profilePic}
+              onChange={handleChange}
+              placeholder="Paste image URL"
+              className={`flex-1 px-4 py-2 rounded-xl bg-[#11121f] border ${validPic ? "border-cyan-500" : "border-red-500"} focus:ring-2 focus:ring-cyan-400 text-white`}
+            />
+          </div>
+          {(localPreview || form.profilePic) && (
             <img
-              src={form.profilePic}
+              src={localPreview || form.profilePic}
               alt="Profile"
-              className="w-32 h-32 rounded-full mt-2 object-cover border border-cyan-500"
+              className="w-32 h-32 rounded-full mt-3 object-cover border border-cyan-500"
             />
           )}
           {!validPic && (

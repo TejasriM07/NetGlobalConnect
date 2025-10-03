@@ -16,6 +16,7 @@ export default function Profile() {
   const [message, setMessage] = useState("");
   const [showConnections, setShowConnections] = useState(false);
   const navigate = useNavigate();
+  const isAdmin = (profile?.role === "Admin") || (localStorage.getItem("userRole") === "Admin");
 
   // Fetch profile info
   const fetchProfileData = async () => {
@@ -23,7 +24,6 @@ export default function Profile() {
       const res = await getProfile();
       setProfile(res.data?.data || null);
     } catch (err) {
-      console.error(err);
       setMessage("Failed to load profile.");
     }
   };
@@ -36,13 +36,11 @@ export default function Profile() {
         getConnections()
       ]);
 
-      console.log("Requests from backend:", reqRes.data.requests);
-      console.log("Connections from backend:", connRes.data);
+      
 
       setConnectionRequests(reqRes.data.requests || []);
       setConnections(connRes.data.connections || connRes.data.data || []);
     } catch (err) {
-      console.error(err);
       setMessage("Failed to load requests/connections.");
     }
   };
@@ -59,12 +57,54 @@ export default function Profile() {
       setMessage(`Request ${action}ed successfully`);
       fetchRequestsAndConnections(); // Refresh data
     } catch (err) {
-      console.error(err);
       setMessage(`Failed to ${action} request`);
     }
   };
 
-  if (!profile) return <p className="text-white p-6">Loading profile...</p>;
+  if (!profile) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-[#0f0f1a] via-[#0d0d17] to-[#12121f] p-10 text-white flex justify-center">
+        <div className="max-w-6xl w-full grid md:grid-cols-3 gap-8 animate-pulse">
+          <div className="md:col-span-1 bg-[#11121f]/80 rounded-3xl p-6 border border-[#06b6d4]/20">
+            <div className="flex flex-col items-center text-center">
+              <div className="w-32 h-32 rounded-full border-4 border-cyan-400/30 bg-[#1a1a2f]" />
+              <div className="mt-4 h-6 w-32 bg-[#1a1a2f] rounded" />
+              <div className="mt-2 h-4 w-20 bg-[#1a1a2f] rounded" />
+            </div>
+            <div className="mt-6 space-y-3">
+              <div className="h-10 bg-[#1a1a2f] rounded-xl" />
+              <div className="h-10 bg-[#1a1a2f] rounded-xl" />
+              <div className="h-10 bg-[#1a1a2f] rounded-xl" />
+            </div>
+            <div className="mt-6 h-10 bg-[#1a1a2f] rounded-xl" />
+          </div>
+
+          <div className="md:col-span-2 space-y-6">
+            <div className="bg-[#11121f]/80 rounded-3xl p-6 border border-[#7c3aed]/20">
+              <div className="h-5 w-24 bg-[#1a1a2f] rounded mb-3" />
+              <div className="h-4 w-4/5 bg-[#1a1a2f] rounded mb-2" />
+              <div className="h-4 w-2/3 bg-[#1a1a2f] rounded" />
+            </div>
+            <div className="bg-[#11121f]/80 rounded-3xl p-6 border border-[#06b6d4]/20">
+              <div className="h-5 w-24 bg-[#1a1a2f] rounded mb-3" />
+              <div className="flex gap-2 flex-wrap">
+                <div className="h-6 w-16 bg-[#1a1a2f] rounded-full" />
+                <div className="h-6 w-20 bg-[#1a1a2f] rounded-full" />
+                <div className="h-6 w-14 bg-[#1a1a2f] rounded-full" />
+              </div>
+            </div>
+            <div className="bg-[#11121f]/80 rounded-3xl p-6 border border-pink-400/20">
+              <div className="h-5 w-28 bg-[#1a1a2f] rounded mb-3" />
+              <div className="space-y-2">
+                <div className="h-12 bg-[#1a1a2f] rounded-xl" />
+                <div className="h-12 bg-[#1a1a2f] rounded-xl" />
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#0f0f1a] via-[#0d0d17] to-[#12121f] p-10 text-white flex justify-center">
@@ -74,7 +114,7 @@ export default function Profile() {
           <div className="flex flex-col items-center text-center">
             <div className="w-32 h-32 rounded-full border-4 border-cyan-400 shadow-lg overflow-hidden">
               <img
-                src={profile.profilePic?.url || defaultAvatar}
+              src={profile.profilePic?.url || "/default-avatar.svg"}
                 alt="Profile"
                 className="w-full h-full object-cover"
               />
@@ -242,6 +282,32 @@ export default function Profile() {
             ) : (
               <p className="text-slate-400 text-sm">No connections yet</p>
             )}
+          </div>
+
+        { }
+          <div className="bg-[#11121f]/80 rounded-3xl p-6 border border-[#7c3aed]/30 shadow-inner">
+            <h3 className="text-cyan-400 font-bold mb-3 flex items-center gap-2">
+              Quick Actions
+            </h3>
+            <div className="flex gap-2">
+            {isAdmin ? (
+                <button
+                  type="button"
+                  onClick={() => navigate("/reported-posts")}
+                  className="px-3 py-2 rounded-lg text-sm border border-rose-600 text-rose-300 hover:bg-rose-600/10"
+                >
+                  Reported Posts
+                </button>
+              ) : (
+                <button
+                  type="button"
+                  onClick={() => navigate("/my-reported-posts")}
+                  className="px-3 py-2 rounded-lg text-sm border border-amber-600 text-amber-300 hover:bg-amber-600/10"
+                >
+                  My Reported Posts
+                </button>
+              )}
+            </div>
           </div>
         </div>
       </div>

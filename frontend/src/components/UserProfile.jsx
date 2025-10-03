@@ -24,7 +24,6 @@ export default function UserProfile() {
 
         setCurrentUser(meRes.data.data);
       } catch (err) {
-        console.error(err);
         setMessage(err.response?.data?.message || "Failed to load profile.");
       }
     };
@@ -50,7 +49,6 @@ export default function UserProfile() {
 
       setMessage("Connection request sent!");
     } catch (err) {
-      console.error(err);
       setMessage("Failed to send request");
     } finally {
       setConnecting(false);

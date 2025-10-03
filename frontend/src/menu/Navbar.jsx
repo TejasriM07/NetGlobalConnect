@@ -1,10 +1,11 @@
 // src/components/Navbar.jsx
 import React, { useEffect, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, NavLink, useNavigate } from "react-router-dom";
 
 export default function Navbar() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [userRole, setUserRole] = useState("");
+  const [hasScrolled, setHasScrolled] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [menuOpen, setMenuOpen] = useState(false); // for mobile
   const navigate = useNavigate();
@@ -12,9 +13,37 @@ export default function Navbar() {
 
   useEffect(() => {
     const role = localStorage.getItem("userRole") || "";
-    setIsLoggedIn(!!token);
+    const t = localStorage.getItem("token");
+    setIsLoggedIn(!!t);
     setUserRole(role);
-  }, [token]);
+
+    const updateFromStorage = () => {
+      const updatedToken = localStorage.getItem("token");
+      const updatedRole = localStorage.getItem("userRole") || "";
+      setIsLoggedIn(!!updatedToken);
+      setUserRole(updatedRole);
+    };
+
+    const onAuthChange = () => updateFromStorage();
+    const onStorage = (e) => {
+      if (e.key === "token" || e.key === "userRole") updateFromStorage();
+    };
+    const onFocus = () => updateFromStorage();
+
+    window.addEventListener("authchange", onAuthChange);
+    window.addEventListener("storage", onStorage);
+    window.addEventListener("focus", onFocus);
+
+    // also observe URL changes to update nav without hard refresh
+    const unlisten = () => {};
+
+    return () => {
+      window.removeEventListener("authchange", onAuthChange);
+      window.removeEventListener("storage", onStorage);
+      window.removeEventListener("focus", onFocus);
+      unlisten();
+    };
+  }, []);
 
   const handleLogout = () => {
     localStorage.clear();
@@ -28,74 +57,67 @@ export default function Navbar() {
     navigate("/search-results", { state: { query: searchQuery } });
   };
 
+  const handleSearch = (e) => {
+    e.preventDefault();
+    if (!searchQuery.trim()) return;
+    navigate("/search-results", { state: { query: searchQuery } });
+    setMenuOpen(false);
+  };
+
   return (
-    <nav className="bg-gray-900 text-white shadow-md">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between h-16 items-center">
-          {/* Left - App Name */}
-          <div className="flex-shrink-0">
-            <Link to="/" className="font-bold text-xl">
-              Connect
-            </Link>
+    <nav className={`sticky top-0 z-40 bg-gray-900 text-white border-b border-gray-800 ${hasScrolled ? "shadow-[0_2px_12px_rgba(0,0,0,0.35)]" : ""}`}>
+      <div className="max-w-6xl mx-auto px-4">
+        <div className="flex h-14 items-center justify-between">
+          <div className="flex items-center gap-3">
+            <NavLink to={isLoggedIn ? "/feed" : "/"} className="font-bold text-xl tracking-tight">
+              NetGlobalConnect
+            </NavLink>
           </div>
 
-{/* Center - Search */}
-{isLoggedIn && (
-  <div className="flex-1 flex justify-center mx-4">
-    <form
-      onSubmit={handleSearch}
-      className="flex w-full max-w-lg sm:max-w-md md:max-w-lg lg:max-w-xl"
-    >
-      <input
-        type="text"
-        placeholder="Search..."
-        value={searchQuery}
-        onChange={(e) => setSearchQuery(e.target.value)}
-        className="flex-1 px-4 py-1 rounded-l bg-gray-200 text-black focus:outline-none w-full"
-      />
-      <button
-        type="submit"
-        className="ml-2 bg-cyan-500 hover:bg-cyan-600 px-3 sm:px-4 py-1 rounded-r text-white whitespace-nowrap"
-      >
-        Search
-      </button>
-    </form>
-  </div>
-)}
+          {isLoggedIn && (
+            <div className="hidden md:flex flex-1 justify-center mx-4">
+              <form onSubmit={handleSearch} className="flex w-full max-w-xl">
+                <input
+                  type="text"
+                  placeholder="Search..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="flex-1 px-4 py-1 rounded-l bg-gray-200 text-black focus:outline-none w-full"
+                />
+                <button type="submit" className="ml-2 bg-cyan-500 hover:bg-cyan-600 px-4 py-1 rounded-r text-white">
+                  Search
+                </button>
+              </form>
+            </div>
+          )}
 
-
-          {/* Right - Menu */}
-          <div className="hidden md:flex items-center gap-4">
+          <div className="hidden md:flex items-center gap-2">
             {!isLoggedIn ? (
               <>
-                <Link to="/login" className="hover:text-cyan-400">
+                <NavLink to="/" className={({ isActive }) => `${baseLink} ${isActive ? active : inactive}`}>
+                  Home
+                </NavLink>
+                <NavLink to="/login" className={({ isActive }) => `${baseLink} ${isActive ? active : inactive}`}>
                   Login
-                </Link>
-                <Link to="/signup" className="hover:text-cyan-400">
+                </NavLink>
+                <NavLink to="/signup" className={({ isActive }) => `${baseLink} ${isActive ? active : inactive}`}>
                   Signup
                 </Link>
               </>
             ) : (
               <>
-                <Link to="/profile" className="hover:text-cyan-400">
+                <NavLink to="/feed" end className={({ isActive }) => `${baseLink} ${isActive ? active : inactive}`}>
+                  Feed
+                </NavLink>
+                <NavLink to="/profile" className={({ isActive }) => `${baseLink} ${isActive ? active : inactive}`}>
                   Profile
-                </Link>
-
-                {userRole === "JobSeeker" ? (
-                  <Link to="/jobs" className="hover:text-green-400">
-                    Apply Jobs
-                  </Link>
-                ) : (
-                  <>
-                    <Link to="/jobs" className="hover:text-yellow-400">
-                      View Jobs
-                    </Link>
-                  </>
-                )}
-
-                <Link to="/messages" className="hover:text-yellow-400">
+                </NavLink>
+                <NavLink to="/jobs" className={({ isActive }) => `${baseLink} ${isActive ? active : inactive}`}>
+                  Jobs
+                </NavLink>
+                <NavLink to="/messages" className={({ isActive }) => `${baseLink} ${isActive ? active : inactive}`}>
                   Inbox
-                </Link>
+                </NavLink>
 
                 <button onClick={handleLogout} className="hover:text-red-400">
                   Logout
@@ -110,26 +132,11 @@ export default function Navbar() {
               onClick={() => setMenuOpen(!menuOpen)}
               className="text-gray-300 hover:text-white focus:outline-none"
             >
-              <svg
-                className="h-6 w-6"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
+              <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 {menuOpen ? (
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M6 18L18 6M6 6l12 12"
-                  />
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                 ) : (
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M4 6h16M4 12h16M4 18h16"
-                  />
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
                 )}
               </svg>
             </button>
@@ -140,6 +147,21 @@ export default function Navbar() {
       {/* Mobile Menu */}
       {menuOpen && (
         <div className="md:hidden bg-gray-800 px-2 pt-2 pb-3 space-y-1">
+          {isLoggedIn && (
+            <form onSubmit={handleSearch} className="flex w-full px-2 pb-2">
+              <input
+                type="text"
+                placeholder="Search..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="flex-1 px-3 py-2 rounded-l bg-gray-200 text-black focus:outline-none"
+              />
+              <button type="submit" className="bg-cyan-500 hover:bg-cyan-600 px-4 py-2 rounded-r text-white">
+                Search
+              </button>
+            </form>
+          )}
+
           {!isLoggedIn ? (
             <>
               <Link to="/login" className="block px-3 py-2 rounded hover:bg-gray-700">
@@ -154,27 +176,13 @@ export default function Navbar() {
               <Link to="/profile" className="block px-3 py-2 rounded hover:bg-gray-700">
                 Profile
               </Link>
-
-              {userRole === "JobSeeker" ? (
-                <Link to="/jobs" className="block px-3 py-2 rounded hover:bg-gray-700">
-                  Apply Jobs
-                </Link>
-              ) : (
-                <>
-                  <Link to="/jobs" className="block px-3 py-2 rounded hover:bg-gray-700">
-                    View Jobs
-                  </Link>
-                </>
-              )}
-
+              <Link to="/jobs" className="block px-3 py-2 rounded hover:bg-gray-700">
+                Jobs
+              </Link>
               <Link to="/messages" className="block px-3 py-2 rounded hover:bg-gray-700">
                 Inbox
               </Link>
-
-              <button
-                onClick={handleLogout}
-                className="w-full text-left px-3 py-2 rounded hover:bg-red-600"
-              >
+              <button onClick={handleLogout} className="w-full text-left px-3 py-2 rounded hover:bg-red-600">
                 Logout
               </button>
             </>

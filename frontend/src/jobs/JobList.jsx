@@ -13,13 +13,13 @@ export default function JobList() {
     const currentUserRole = localStorage.getItem("userRole") || "";
     const currentUserId = localStorage.getItem("userId") || "";
 
-    // Fetch jobs and mark already applied jobs immediately
+    // Fetch jobs and mark already applied jobs !!
     const fetchJobs = async () => {
         try {
             const res = await getJobs();
             const jobsData = Array.isArray(res.data.jobs) ? res.data.jobs : [];
 
-            // mark applied jobs immediately
+            // mark as applied jobs 
             const appliedMap = {};
             jobsData.forEach((job) => {
                 if (job.applicants?.some((a) => a?._id?.toString() === currentUserId)) {
@@ -30,7 +30,6 @@ export default function JobList() {
 
             setJobs(jobsData);
         } catch (err) {
-            console.error(err);
             setError("Failed to fetch jobs");
         } finally {
             setLoading(false);
@@ -44,10 +43,16 @@ export default function JobList() {
 
             await applyToJob(jobId); // <-- API function
 
+            // persist a hint so SearchResult can also reflect
+            try {
+                const appliedSet = new Set(JSON.parse(localStorage.getItem("appliedJobs") || "[]"));
+                appliedSet.add(jobId);
+                localStorage.setItem("appliedJobs", JSON.stringify(Array.from(appliedSet)));
+            } catch {}
+
             // refresh jobs for accurate applicant count
             await fetchJobs();
         } catch (err) {
-            console.error(err);
             setAppliedJobs((prev) => ({ ...prev, [jobId]: false }));
             alert(err.response?.data?.message || "Failed to apply");
         }

@@ -12,13 +12,10 @@ export default function Login() {
 
     // --- Handle token from Google redirect ---
     useEffect(() => {
-        console.log("Login page loaded");
         const params = new URLSearchParams(window.location.search);
         const token = params.get("token");
-        console.log("URL token:", token);
 
         if (token) {
-            console.log("Google login token detected, setting auth...");
             setLoading(true);
             setAuthToken(token);
 
@@ -61,9 +58,11 @@ export default function Login() {
                     localStorage.setItem("userId", meData._id || meData.id || "");
                 }
             } catch (err) {
-                console.warn("Failed to fetch profile after login", err);
             }
 
+            try { window.dispatchEvent(new Event("authchange")); } catch {}
+            navigate("/profile");
+            try { window.dispatchEvent(new Event("authchange")); } catch {}
             navigate("/profile");
         } catch (err) {
             console.error("Login error:", err);
@@ -74,7 +73,6 @@ export default function Login() {
     };
 
     const handleGoogleLogin = () => {
-        console.log("Redirecting to Google OAuth...");
         window.location.href = "http://localhost:5000/api/auth/google";
     };
 
