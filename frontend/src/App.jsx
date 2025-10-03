@@ -14,6 +14,11 @@ import MessagesList from "./components/MessagesList";
 import CreateJob from "./jobs/CreateJob";
 import JobList from "./jobs/JobList";
 import ApplicantsList from "./jobs/ApplicantsList";
+<<<<<<< Updated upstream
+=======
+import SearchResults from "./pages/SearchResult";
+import CreateJob from "./jobs/CreateJob";
+>>>>>>> Stashed changes
 
 export default function App() {
   return (
@@ -91,6 +96,15 @@ export default function App() {
           element={
             <PrivateRoute>
               <JobList />
+            </PrivateRoute>
+          }
+        />
+
+        <Route
+          path="/jobs/create"
+          element={
+            <PrivateRoute>
+              <CreateJob />
             </PrivateRoute>
           }
         />
