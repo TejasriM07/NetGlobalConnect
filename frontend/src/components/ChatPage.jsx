@@ -75,7 +75,7 @@ export default function ChatPage() {
         });
 
         socket.on("private_message", (message) => {
-            if (!message?._id) return;
+            if (!message?._id || message.senderId === myId) return;
             setMessages((prev) => {
                 if (prev.some((m) => m._id === message._id)) return prev;
                 return [...prev, message];
