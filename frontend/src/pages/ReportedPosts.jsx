@@ -23,7 +23,7 @@ export default function ReportedPosts() {
 
   const handleDelete = async (postId) => {
     try {
-      await axios.delete(`http://localhost:5000/api/posts/${postId}`, {
+      await axios.delete(`https://netglobalconnect.onrender.com/api/posts/${postId}`, {
         headers: { Authorization: `Bearer ${localStorage.getItem("token")}` }
       });
       setPosts((prev) => prev.filter((p) => p._id !== postId));

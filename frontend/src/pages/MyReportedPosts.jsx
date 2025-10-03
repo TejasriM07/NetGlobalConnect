@@ -10,7 +10,7 @@ export default function MyReportedPosts() {
   const fetchMine = async () => {
     try {
       setLoading(true);
-      const res = await axios.get("http://localhost:5000/api/posts", {
+      const res = await axios.get("https://netglobalconnect.onrender.com/api/posts", {
         headers: { Authorization: `Bearer ${localStorage.getItem("token")}` }
       });
       const all = res.data?.posts || [];
@@ -27,7 +27,7 @@ export default function MyReportedPosts() {
 
   const handleDelete = async (postId) => {
     try {
-      await axios.delete(`http://localhost:5000/api/posts/${postId}`, {
+      await axios.delete(`https://netglobalconnect.onrender.com/api/posts/${postId}`, {
         headers: { Authorization: `Bearer ${localStorage.getItem("token")}` }
       });
       setPosts((prev) => prev.filter((p) => p._id !== postId));

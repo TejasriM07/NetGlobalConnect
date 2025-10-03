@@ -1,15 +1,14 @@
 // src/components/Navbar.jsx
 import React, { useEffect, useState } from "react";
-import { Link, NavLink, useNavigate } from "react-router-dom";
+import { NavLink, Link, useNavigate } from "react-router-dom";
 
 export default function Navbar() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [userRole, setUserRole] = useState("");
   const [hasScrolled, setHasScrolled] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
-  const [menuOpen, setMenuOpen] = useState(false); // for mobile
+  const [menuOpen, setMenuOpen] = useState(false);
   const navigate = useNavigate();
-  const token = localStorage.getItem("token");
 
   useEffect(() => {
     const role = localStorage.getItem("userRole") || "";
@@ -34,14 +33,10 @@ export default function Navbar() {
     window.addEventListener("storage", onStorage);
     window.addEventListener("focus", onFocus);
 
-    // also observe URL changes to update nav without hard refresh
-    const unlisten = () => {};
-
     return () => {
       window.removeEventListener("authchange", onAuthChange);
       window.removeEventListener("storage", onStorage);
       window.removeEventListener("focus", onFocus);
-      unlisten();
     };
   }, []);
 
@@ -55,14 +50,13 @@ export default function Navbar() {
     e.preventDefault();
     if (!searchQuery.trim()) return;
     navigate("/search-results", { state: { query: searchQuery } });
-  };
-
-  const handleSearch = (e) => {
-    e.preventDefault();
-    if (!searchQuery.trim()) return;
-    navigate("/search-results", { state: { query: searchQuery } });
     setMenuOpen(false);
   };
+
+  // Classes for NavLink
+  const baseLink = "px-3 py-2 rounded-md text-sm font-medium";
+  const active = "bg-gray-700 text-white";
+  const inactive = "text-gray-300 hover:bg-gray-700 hover:text-white";
 
   return (
     <nav className={`sticky top-0 z-40 bg-gray-900 text-white border-b border-gray-800 ${hasScrolled ? "shadow-[0_2px_12px_rgba(0,0,0,0.35)]" : ""}`}>
@@ -102,7 +96,7 @@ export default function Navbar() {
                 </NavLink>
                 <NavLink to="/signup" className={({ isActive }) => `${baseLink} ${isActive ? active : inactive}`}>
                   Signup
-                </Link>
+                </NavLink>
               </>
             ) : (
               <>
@@ -118,7 +112,6 @@ export default function Navbar() {
                 <NavLink to="/messages" className={({ isActive }) => `${baseLink} ${isActive ? active : inactive}`}>
                   Inbox
                 </NavLink>
-
                 <button onClick={handleLogout} className="hover:text-red-400">
                   Logout
                 </button>
