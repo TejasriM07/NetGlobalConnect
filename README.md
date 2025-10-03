@@ -19,6 +19,12 @@ Global_Connect addresses critical limitations of existing networking platforms b
 - **Secure Authentication**: JWT-based security with role-based access control
 - **Administrative Dashboard**: Content moderation and user management tools
 
+## 🌐 Live Demo
+
+- **Frontend:** [https://net-global-connect.netlify.app/](https://net-global-connect.netlify.app/)  
+- **Backend API:** [https://netglobalconnect.onrender.com](https://netglobalconnect.onrender.com)
+- **API Documentation:** [https://documenter.getpostman.com/view/30794754/2sB3QDvYTE](https://documenter.getpostman.com/view/30794754/2sB3QDvYTE)
+
 ## 🏗️ System Architecture
 
 ```
