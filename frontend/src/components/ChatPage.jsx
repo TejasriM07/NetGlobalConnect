@@ -12,7 +12,6 @@ export default function ChatPage() {
     const [myId, setMyId] = useState(null);
     const [myName, setMyName] = useState("");
     const [otherUserName, setOtherUserName] = useState("");
-    const sendingRef = useRef(false);
     const messagesEndRef = useRef(null);
     const socketRef = useRef(null);
 
@@ -35,6 +34,7 @@ export default function ChatPage() {
                 const otherRes = await getUserById(otherUserId);
                 setOtherUserName(otherRes.data?.data?.name || "Unknown User");
             } catch (err) {
+                console.error("Failed to fetch users:", err);
             }
         };
         fetchUsers();
@@ -42,14 +42,14 @@ export default function ChatPage() {
 
     // Fetch initial messages
     useEffect(() => {
-        if (!myId) return;
-        let didCancel = false;
         const fetchMessages = async () => {
+            if (!myId) return;
             try {
                 const res = await axios.get(`${BACKEND_URL}/api/messages/${otherUserId}`, {
                     headers: { Authorization: `Bearer ${token}` },
                 });
-                if (!didCancel && res.data?.success) {
+
+                if (res.data?.success) {
                     const newMsgs = res.data.data || [];
                     setMessages((prev) => {
                         const map = new Map();
@@ -58,18 +58,15 @@ export default function ChatPage() {
                     });
                 }
             } catch (err) {
+                console.error("Failed to fetch messages:", err);
             }
         };
         fetchMessages();
-        return () => { didCancel = true; };
     }, [myId, otherUserId, token]);
 
     // Initialize Socket.IO
     useEffect(() => {
         if (!myId) return;
-        if (socketRef.current) {
-            socketRef.current.disconnect();
-        }
         const socket = io(BACKEND_URL, { auth: { token } });
         socketRef.current = socket;
 
@@ -78,7 +75,7 @@ export default function ChatPage() {
         });
 
         socket.on("private_message", (message) => {
-            if (!message?._id) return;
+            if (!message?._id || message.senderId === myId) return;
             setMessages((prev) => {
                 if (prev.some((m) => m._id === message._id)) return prev;
                 return [...prev, message];
@@ -91,8 +88,6 @@ export default function ChatPage() {
     // Send message
     const handleSendMessage = async () => {
         if (!newMessage.trim()) return;
-        if (sendingRef.current) return; // prevent double-send
-        sendingRef.current = true;
         const content = newMessage;
         setNewMessage("");
 
@@ -118,10 +113,16 @@ export default function ChatPage() {
                 setMessages((prev) =>
                     prev.map((m) => (m._id === tempMessage._id ? res.data.data : m))
                 );
+
+                // Emit to receiver's room
+                socketRef.current.emit("private_message", {
+                    ...res.data.data,
+                    to: otherUserId,
+                });
             }
         } catch (err) {
+            console.error("Send failed:", err);
         }
-        sendingRef.current = false;
     };
 
     return (
