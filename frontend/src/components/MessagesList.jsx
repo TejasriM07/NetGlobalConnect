@@ -6,7 +6,6 @@ import axios from "axios";
 export default function MessagesList() {
   const [conversations, setConversations] = useState([]);
 
-  
   const BACKEND_URL =
     import.meta.env.VITE_BACKEND_URL || "http://localhost:5000";
 
@@ -22,6 +21,7 @@ export default function MessagesList() {
           setConversations(res.data.data || []);
         }
       } catch (err) {
+        console.error("Error fetching conversations:", err);
       }
     };
 
@@ -37,26 +37,28 @@ export default function MessagesList() {
         <p className="text-gray-400">No conversations yet.</p>
       ) : (
         <ul className="space-y-2">
-          {conversations.map((conv) => (
-            <li
-              key={conv.user._id}
-              className="p-3 bg-gray-800 rounded hover:bg-gray-700 transition"
-            >
-              <Link to={`/messages/${conv.user._id}`}>
-                <div className="font-semibold">{conv.user.name}</div>
-                <div className="text-sm text-gray-400 truncate">
-                  {conv.lastMessage?.content || "No messages"}
-                </div>
-                <div className="text-xs text-gray-500">
-                  {conv.lastMessage
-                    ? new Date(conv.lastMessage.timestamp).toLocaleString()
-                    : ""}
-                </div>
-              </Link>
-            </li>
-          ))}
+          {conversations
+            ?.filter((conv) => conv && conv.user) //  skip invalid/null entries
+            ?.map((conv, index) => (
+              <li
+                key={conv.user?._id || index} 
+                className="p-3 bg-gray-800 rounded hover:bg-gray-700 transition"
+              >
+                <Link to={`/messages/${conv.user?._id || ""}`}>
+                  <div className="font-semibold">{conv.user?.name || "Unknown User"}</div>
+                  <div className="text-sm text-gray-400 truncate">
+                    {conv.lastMessage?.content || "No messages"}
+                  </div>
+                  <div className="text-xs text-gray-500">
+                    {conv.lastMessage?.timestamp
+                      ? new Date(conv.lastMessage.timestamp).toLocaleString()
+                      : ""}
+                  </div>
+                </Link>
+              </li>
+            ))}
         </ul>
       )}
     </div>
   );
-};
+}

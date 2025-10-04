@@ -5,6 +5,7 @@ import Navbar from "./menu/Navbar";
 import Footer from "./components/Footer";
 import Signup from "./menu/Signup";
 import Login from "./menu/Login";
+import CreateJob from "./jobs/CreateJob";
 import Profile from "./components/Profile";
 import ProfileForm from "./components/ProfileForm";
 import PrivateRoute from "./menu/PrivateRoute";
@@ -27,6 +28,15 @@ export default function App() {
         <Navbar />
         <main className="flex-1">
       <Routes>
+       <Route
+  path="/create-job"
+  element={
+    <PrivateRoute allowedRole="employee">
+      <CreateJob />
+    </PrivateRoute>
+  }
+/>
+
         <Route path="/signup" element={<Signup />} />
         <Route path="/login" element={<Login />} />
         <Route path="/oauth-success" element={<OAuthSuccess />} />
@@ -65,7 +75,7 @@ export default function App() {
           }
         />
 
-        {/* ✅ Inbox route */}
+        {/*  Inbox route */}
         <Route
           path="/messages"
           element={
@@ -75,7 +85,7 @@ export default function App() {
           }
         />
 
-        {/* ✅ Chat route */}
+        {/*  Chat route */}
         <Route
           path="/messages/:id"
           element={

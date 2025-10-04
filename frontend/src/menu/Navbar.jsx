@@ -34,14 +34,10 @@ export default function Navbar() {
     window.addEventListener("storage", onStorage);
     window.addEventListener("focus", onFocus);
 
-    // also observe URL changes to update nav without hard refresh
-    const unlisten = () => {};
-
     return () => {
       window.removeEventListener("authchange", onAuthChange);
       window.removeEventListener("storage", onStorage);
       window.removeEventListener("focus", onFocus);
-      unlisten();
     };
   }, []);
 
@@ -49,7 +45,9 @@ export default function Navbar() {
     localStorage.clear();
     setIsLoggedIn(false);
     navigate("/login");
-    try { window.dispatchEvent(new Event("authchange")); } catch {}
+    try {
+      window.dispatchEvent(new Event("authchange"));
+    } catch {}
   };
 
   const baseLink = "px-3 py-2 rounded-md transition-colors";
@@ -71,11 +69,18 @@ export default function Navbar() {
   };
 
   return (
-    <nav className={`sticky top-0 z-40 bg-gray-900 text-white border-b border-gray-800 ${hasScrolled ? "shadow-[0_2px_12px_rgba(0,0,0,0.35)]" : ""}`}>
+    <nav
+      className={`sticky top-0 z-40 bg-gray-900 text-white border-b border-gray-800 ${
+        hasScrolled ? "shadow-[0_2px_12px_rgba(0,0,0,0.35)]" : ""
+      }`}
+    >
       <div className="max-w-6xl mx-auto px-4">
         <div className="flex h-14 items-center justify-between">
           <div className="flex items-center gap-3">
-            <NavLink to={isLoggedIn ? "/feed" : "/"} className="font-bold text-xl tracking-tight">
+            <NavLink
+              to={isLoggedIn ? "/feed" : "/"}
+              className="font-bold text-xl tracking-tight"
+            >
               NetGlobalConnect
             </NavLink>
           </div>
@@ -90,7 +95,10 @@ export default function Navbar() {
                   onChange={(e) => setSearchQuery(e.target.value)}
                   className="flex-1 px-4 py-1 rounded-l bg-gray-200 text-black focus:outline-none w-full"
                 />
-                <button type="submit" className="ml-2 bg-cyan-500 hover:bg-cyan-600 px-4 py-1 rounded-r text-white">
+                <button
+                  type="submit"
+                  className="ml-2 bg-cyan-500 hover:bg-cyan-600 px-4 py-1 rounded-r text-white"
+                >
                   Search
                 </button>
               </form>
@@ -100,31 +108,83 @@ export default function Navbar() {
           <div className="hidden md:flex items-center gap-2">
             {!isLoggedIn ? (
               <>
-                <NavLink to="/" className={({ isActive }) => `${baseLink} ${isActive ? active : inactive}`}>
+                <NavLink
+                  to="/"
+                  className={({ isActive }) =>
+                    `${baseLink} ${isActive ? active : inactive}`
+                  }
+                >
                   Home
                 </NavLink>
-                <NavLink to="/login" className={({ isActive }) => `${baseLink} ${isActive ? active : inactive}`}>
+                <NavLink
+                  to="/login"
+                  className={({ isActive }) =>
+                    `${baseLink} ${isActive ? active : inactive}`
+                  }
+                >
                   Login
                 </NavLink>
-                <NavLink to="/signup" className={({ isActive }) => `${baseLink} ${isActive ? active : inactive}`}>
+                <NavLink
+                  to="/signup"
+                  className={({ isActive }) =>
+                    `${baseLink} ${isActive ? active : inactive}`
+                  }
+                >
                   Signup
                 </NavLink>
               </>
             ) : (
               <>
-                <NavLink to="/feed" end className={({ isActive }) => `${baseLink} ${isActive ? active : inactive}`}>
+                <NavLink
+                  to="/feed"
+                  end
+                  className={({ isActive }) =>
+                    `${baseLink} ${isActive ? active : inactive}`
+                  }
+                >
                   Feed
                 </NavLink>
-                <NavLink to="/profile" className={({ isActive }) => `${baseLink} ${isActive ? active : inactive}`}>
+                <NavLink
+                  to="/profile"
+                  className={({ isActive }) =>
+                    `${baseLink} ${isActive ? active : inactive}`
+                  }
+                >
                   Profile
                 </NavLink>
-                <NavLink to="/jobs" className={({ isActive }) => `${baseLink} ${isActive ? active : inactive}`}>
-                  Jobs
+
+                {/*  Only show Create Job if userRole === "Employee" */}
+                {userRole === "Employee" && (
+                  <NavLink
+                    to="/create-job"
+                    className={({ isActive }) =>
+                      `${baseLink} ${isActive ? active : inactive}`
+                    }
+                  >
+                    Create Jobs
+                  </NavLink>
+                )}
+
+                <NavLink
+                  to="/jobs"
+                  className={({ isActive }) =>
+                    `${baseLink} ${isActive ? active : inactive}`
+                  }
+                >
+                  View Jobs
                 </NavLink>
-                <NavLink to="/messages" className={({ isActive }) => `${baseLink} ${isActive ? active : inactive}`}>
+                <NavLink
+                  to="/messages"
+                  className={({ isActive }) =>
+                    `${baseLink} ${isActive ? active : inactive}`
+                  }
+                >
                   Inbox
                 </NavLink>
-                <button onClick={handleLogout} className="ml-2 px-3 py-2 rounded-md text-red-300 hover:text-white hover:bg-red-600/20">
+                <button
+                  onClick={handleLogout}
+                  className="ml-2 px-3 py-2 rounded-md text-red-300 hover:text-white hover:bg-red-600/20"
+                >
                   Logout
                 </button>
               </>
@@ -137,11 +197,26 @@ export default function Navbar() {
               onClick={() => setMenuOpen(!menuOpen)}
               className="text-gray-300 hover:text-white focus:outline-none"
             >
-              <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg
+                className="h-6 w-6"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
                 {menuOpen ? (
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M6 18L18 6M6 6l12 12"
+                  />
                 ) : (
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M4 6h16M4 12h16M4 18h16"
+                  />
                 )}
               </svg>
             </button>
@@ -161,7 +236,10 @@ export default function Navbar() {
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="flex-1 px-3 py-2 rounded-l bg-gray-200 text-black focus:outline-none"
               />
-              <button type="submit" className="bg-cyan-500 hover:bg-cyan-600 px-4 py-2 rounded-r text-white">
+              <button
+                type="submit"
+                className="bg-cyan-500 hover:bg-cyan-600 px-4 py-2 rounded-r text-white"
+              >
                 Search
               </button>
             </form>
@@ -169,25 +247,54 @@ export default function Navbar() {
 
           {!isLoggedIn ? (
             <>
-              <Link to="/login" className="block px-3 py-2 rounded hover:bg-gray-700">
+              <Link
+                to="/login"
+                className="block px-3 py-2 rounded hover:bg-gray-700"
+              >
                 Login
               </Link>
-              <Link to="/signup" className="block px-3 py-2 rounded hover:bg-gray-700">
+              <Link
+                to="/signup"
+                className="block px-3 py-2 rounded hover:bg-gray-700"
+              >
                 Signup
               </Link>
             </>
           ) : (
             <>
-              <Link to="/profile" className="block px-3 py-2 rounded hover:bg-gray-700">
+              <Link
+                to="/profile"
+                className="block px-3 py-2 rounded hover:bg-gray-700"
+              >
                 Profile
               </Link>
-              <Link to="/jobs" className="block px-3 py-2 rounded hover:bg-gray-700">
-                Jobs
+
+              {/*  Only employees see this on mobile */}
+              {userRole === "Employee" && (
+                <Link
+                  to="/create-job"
+                  className="block px-3 py-2 rounded hover:bg-gray-700"
+                >
+                  Create Jobs
+                </Link>
+              )}
+
+              <Link
+                to="/jobs"
+                className="block px-3 py-2 rounded hover:bg-gray-700"
+              >
+                View Jobs
               </Link>
-              <Link to="/messages" className="block px-3 py-2 rounded hover:bg-gray-700">
+              <Link
+                to="/messages"
+                className="block px-3 py-2 rounded hover:bg-gray-700"
+              >
                 Inbox
               </Link>
-              <button onClick={handleLogout} className="w-full text-left px-3 py-2 rounded hover:bg-red-600">
+              <button
+                onClick={handleLogout}
+                className="w-full text-left px-3 py-2 rounded hover:bg-red-600"
+              >
                 Logout
               </button>
             </>
