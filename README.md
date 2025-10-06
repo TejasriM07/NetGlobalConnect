@@ -114,8 +114,8 @@ Frontend (React.js) → API Gateway (Express.js) → Backend Services (Node.js) 
    ```
 
 6. **Access the Application**
-   - Frontend: `http://localhost:5173`
-   - Backend API: `http://localhost:5000`
+   - Frontend: `https://net-global-connect.netlify.app`
+   - Backend API: `https://netglobalconnect.onrender.com`
 
 ## 📂 Project Structure
 

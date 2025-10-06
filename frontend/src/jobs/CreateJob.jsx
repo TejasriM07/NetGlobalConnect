@@ -50,69 +50,92 @@ export default function CreateJob() {
     };
 
     return (
-        <div className="min-h-screen bg-black flex items-center justify-center p-6">
-            <div className="w-full max-w-md bg-black/60 backdrop-blur-md border border-purple-600 rounded-2xl p-8 shadow-lg">
-                <h2 className="text-3xl font-bold text-white mb-6 text-center">
-                    Create Job Post
-                </h2>
+        <div className="min-h-screen bg-slate-50 p-8">
+            <div className="max-w-2xl mx-auto">
+                <h2 className="text-3xl font-bold text-slate-900 mb-8 text-center">Create New Job</h2>
 
-                {message && (
-                    <p
-                        className={`mb-4 text-center ${message.startsWith("✅") ? "text-green-400" : "text-red-400"
-                            }`}
-                    >
-                        {message}
-                    </p>
-                )}
+                <div className="bg-white rounded-xl shadow-lg border border-slate-200 p-8">
+                    {message && (
+                        <div className={`p-4 rounded-lg mb-6 ${
+                            message.includes("✅") 
+                                ? "bg-green-50 text-green-800 border border-green-200" 
+                                : "bg-red-50 text-red-800 border border-red-200"
+                        }`}>
+                            {message}
+                        </div>
+                    )}
 
-                <form onSubmit={handleSubmit} className="space-y-4">
-                    <input
-                        type="text"
-                        name="title"
-                        placeholder="Job Title"
-                        value={formData.title}
-                        onChange={handleChange}
-                        required
-                        className="w-full px-4 py-2 rounded-xl bg-black/50 border border-purple-500 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500"
-                    />
+                    <form onSubmit={handleSubmit} className="space-y-6">
+                        <div>
+                            <label className="block text-slate-700 font-semibold mb-2">
+                                Job Title *
+                            </label>
+                            <input
+                                type="text"
+                                name="title"
+                                value={formData.title}
+                                onChange={handleChange}
+                                required
+                                className="w-full p-3 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                placeholder="e.g. Senior Frontend Developer"
+                            />
+                        </div>
 
-                    <input
-                        type="text"
-                        name="company"
-                        placeholder="Company Name"
-                        value={formData.company}
-                        onChange={handleChange}
-                        required
-                        className="w-full px-4 py-2 rounded-xl bg-black/50 border border-purple-500 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500"
-                    />
+                        <div>
+                            <label className="block text-slate-700 font-semibold mb-2">
+                                Company Name *
+                            </label>
+                            <input
+                                type="text"
+                                name="company"
+                                value={formData.company}
+                                onChange={handleChange}
+                                required
+                                className="w-full p-3 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                placeholder="e.g. Tech Solutions Inc."
+                            />
+                        </div>
 
-                    <textarea
-                        name="description"
-                        placeholder="Job Description"
-                        value={formData.description}
-                        onChange={handleChange}
-                        required
-                        rows="4"
-                        className="w-full px-4 py-2 rounded-xl bg-black/50 border border-purple-500 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500"
-                    />
+                        <div>
+                            <label className="block text-slate-700 font-semibold mb-2">
+                                Job Description *
+                            </label>
+                            <textarea
+                                name="description"
+                                value={formData.description}
+                                onChange={handleChange}
+                                required
+                                rows="5"
+                                className="w-full p-3 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                placeholder="Describe the role, responsibilities, and requirements..."
+                            />
+                        </div>
 
-                    <input
-                        type="text"
-                        name="skills"
-                        placeholder="Required Skills (comma separated)"
-                        value={formData.skills}
-                        onChange={handleChange}
-                        required
-                        className="w-full px-4 py-2 rounded-xl bg-black/50 border border-purple-500 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500"
-                    />
+                        <div>
+                            <label className="block text-slate-700 font-semibold mb-2">
+                                Required Skills
+                            </label>
+                            <input
+                                type="text"
+                                name="skills"
+                                value={formData.skills}
+                                onChange={handleChange}
+                                className="w-full p-3 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                placeholder="e.g. React, Node.js, JavaScript (comma-separated)"
+                            />
+                            <p className="text-slate-500 text-sm mt-1">
+                                Enter skills separated by commas
+                            </p>
+                        </div>
 
-                    <button
-                        type="submit"
-                        className="w-full py-3 rounded-xl font-semibold text-white bg-purple-600 hover:bg-purple-500 shadow-lg transition"
-                    >
-                        Create Job
-                    </button>
-                </form>
+                        <button
+                            type="submit"
+                            className="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-lg font-semibold transition-colors shadow-lg"
+                        >
+                            Create Job Posting
+                        </button>
+                    </form>
+                </div>
             </div>
         </div>
     );

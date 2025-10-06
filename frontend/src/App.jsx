@@ -10,10 +10,12 @@ import PrivateRoute from "./menu/PrivateRoute";
 import Feed from "./pages/Feed";
 import UserProfile from "./components/UserProfile";
 import ChatPage from "./components/ChatPage";
-import MessagesList from "./components/MessagesList";
+import MessagingPage from "./components/MessagingPage";
 import JobList from "./jobs/JobList";
+import CreateJob from "./jobs/CreateJob";
 import ApplicantsList from "./jobs/ApplicantsList";
 import SearchResults from "./pages/SearchResult";
+import Notifications from "./pages/Notifications";
 
 export default function App() {
   return (
@@ -57,22 +59,22 @@ export default function App() {
           }
         />
 
-        {/* ✅ Inbox route */}
+        {/* ✅ Messaging routes */}
         <Route
           path="/messages"
           element={
             <PrivateRoute>
-              <MessagesList />
+              <MessagingPage />
             </PrivateRoute>
           }
         />
 
         {/* ✅ Chat route */}
         <Route
-          path="/messages/:id"
+          path="/chat/:id"
           element={
             <PrivateRoute>
-              <ChatPage />
+              <MessagingPage />
             </PrivateRoute>
           }
         />
@@ -87,10 +89,37 @@ export default function App() {
         />
 
         <Route
+          path="/feed"
+          element={
+            <PrivateRoute>
+              <Feed />
+            </PrivateRoute>
+          }
+        />
+
+        <Route
+          path="/notifications"
+          element={
+            <PrivateRoute>
+              <Notifications />
+            </PrivateRoute>
+          }
+        />
+
+        <Route
           path="/jobs"
           element={
             <PrivateRoute>
               <JobList />
+            </PrivateRoute>
+          }
+        />
+
+        <Route
+          path="/create-job"
+          element={
+            <PrivateRoute>
+              <CreateJob />
             </PrivateRoute>
           }
         />

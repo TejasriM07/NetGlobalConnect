@@ -95,10 +95,15 @@ const login = async (req, res) => {
 // --- Google OAuth login ---
 const oauthLogin = async (req, res) => {
   try {
+    console.log('OAuth login callback triggered');
+    console.log('req.userDoc:', req.userDoc ? 'exists' : 'missing');
+    
     if (!req.userDoc)
       return res.status(500).json({ success: false, message: "OAuth failed" });
 
     const userDoc = req.userDoc;
+    console.log('Generating token for user:', userDoc.email);
+    
     const token = generateToken({
       id: userDoc._id,
       email: userDoc.email,
@@ -106,8 +111,10 @@ const oauthLogin = async (req, res) => {
     });
 
     // 🔹 Redirect to frontend login page (existing Login.jsx handles ?token)
-    const frontend = process.env.FRONTEND_URL || "http://localhost:5173";
+    const frontend = process.env.FRONTEND_URL || "https://net-global-connect.netlify.app";
     const redirectUrl = `${frontend}/login?token=${token}`;
+    console.log('Redirecting to:', redirectUrl);
+    
     return res.redirect(redirectUrl);
   } catch (err) {
     console.error("OAuth callback error", err);

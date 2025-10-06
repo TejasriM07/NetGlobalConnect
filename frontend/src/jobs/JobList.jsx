@@ -65,43 +65,62 @@ export default function JobList() {
         );
 
     return (
-        <div className="min-h-screen bg-black p-8">
-            <h2 className="text-4xl font-bold text-white mb-12 text-center tracking-wide">
-                Job Listings
-            </h2>
+        <div className="min-h-screen bg-slate-50 p-8">
+            <div className="max-w-7xl mx-auto">
+                <div className="flex justify-between items-center mb-8">
+                    <h2 className="text-4xl font-bold text-slate-900 tracking-wide">
+                        {currentUserRole === "Employee" ? "Manage Jobs" : "Job Opportunities"}
+                    </h2>
+                    {currentUserRole === "Employee" && (
+                        <button
+                            onClick={() => navigate("/create-job")}
+                            className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-semibold shadow-lg transition-colors flex items-center gap-2"
+                        >
+                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                            </svg>
+                            Create New Job
+                        </button>
+                    )}
+                </div>
 
-            {jobs.length === 0 ? (
-                <p className="text-gray-400 text-center text-lg">No jobs posted yet.</p>
-            ) : (
-                <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-                    {jobs.map((job) => {
+                {jobs.length === 0 ? (
+                    <div className="text-center py-12">
+                        <p className="text-slate-500 text-lg">No jobs posted yet.</p>
+                        {currentUserRole === "Employee" && (
+                            <p className="text-slate-400 text-sm mt-2">Start by creating your first job posting!</p>
+                        )}
+                    </div>
+                ) : (
+                    <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+                        {jobs.map((job) => {
                         const applicantsCount = job.applicants?.length || 0;
                         const isApplied = appliedJobs[job._id];
 
                         return (
                             <div
                                 key={job._id}
-                                className="relative bg-black/60 backdrop-blur-md border rounded-2xl p-6 shadow-lg hover:shadow-xl transition transform hover:-translate-y-1 border-purple-600"
+                                className="relative bg-white backdrop-blur-md border border-slate-200 rounded-xl p-6 shadow-lg hover:shadow-xl transition transform hover:-translate-y-1 hover:border-blue-300"
                             >
                                 <div className="flex flex-col justify-between h-full">
                                     <div>
-                                        <h3 className="text-2xl font-semibold text-white mb-2">{job.title}</h3>
-                                        <p className="text-purple-300 mb-2">{job.company || "—"}</p>
-                                        <p className="text-gray-300 text-sm mb-4 line-clamp-4">{job.description}</p>
+                                        <h3 className="text-2xl font-semibold text-slate-900 mb-2">{job.title}</h3>
+                                        <p className="text-blue-600 mb-2 font-medium">{job.company || "—"}</p>
+                                        <p className="text-slate-600 text-sm mb-4 line-clamp-4">{job.description}</p>
 
                                         <div className="flex flex-wrap gap-2 mb-4">
                                             {job.skills?.map((skill) => (
                                                 <span
                                                     key={skill}
-                                                    className="px-3 py-1 text-xs font-semibold rounded-full bg-purple-800/30 text-purple-200 backdrop-blur-sm"
+                                                    className="px-3 py-1 text-xs font-semibold rounded-full bg-blue-100 text-blue-800"
                                                 >
                                                     {skill}
                                                 </span>
                                             ))}
                                         </div>
 
-                                        <p className="text-gray-400 text-sm mb-4">
-                                            Applicants: <span className="font-medium text-white">{applicantsCount}</span>
+                                        <p className="text-slate-500 text-sm mb-4">
+                                            Applicants: <span className="font-medium text-slate-700">{applicantsCount}</span>
                                         </p>
                                     </div>
 
@@ -110,17 +129,17 @@ export default function JobList() {
                                             <button
                                                 disabled={isApplied}
                                                 onClick={() => !isApplied && handleApply(job._id)}
-                                                className={`px-6 py-2 rounded-xl font-semibold text-white transition-all duration-300 shadow-md ${isApplied
-                                                        ? "bg-gray-500 opacity-70 cursor-not-allowed"
-                                                        : "bg-purple-600 hover:bg-purple-500 hover:shadow-lg"
+                                                className={`px-6 py-2 rounded-lg font-semibold transition-all duration-300 shadow-md ${isApplied
+                                                        ? "bg-slate-400 text-white opacity-70 cursor-not-allowed"
+                                                        : "bg-blue-600 text-white hover:bg-blue-700 hover:shadow-lg"
                                                     }`}
                                             >
-                                                {isApplied ? "Applied" : "Apply"}
+                                                {isApplied ? "Applied" : "Apply Now"}
                                             </button>
                                         ) : (
                                             <Link
                                                 to={`/jobs/${job._id}/applicants`}
-                                                className="px-6 py-2 bg-purple-600 hover:bg-purple-500 text-white rounded-xl font-semibold shadow-md hover:shadow-lg transition-all duration-300"
+                                                className="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-semibold shadow-md hover:shadow-lg transition-all duration-300"
                                             >
                                                 View Applications
                                             </Link>
@@ -132,6 +151,7 @@ export default function JobList() {
                     })}
                 </div>
             )}
+            </div>
         </div>
     );
 }

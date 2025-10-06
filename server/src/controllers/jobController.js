@@ -1,5 +1,6 @@
 const Job = require("../models/Job");
 const User = require("../models/User");
+const { createNotification } = require("./notificationController");
 
 // Employee: Post a job
 exports.postJob = async (req, res) => {
@@ -34,7 +35,7 @@ exports.listJobs = async (req, res) => {
 // JobSeeker: Apply to job
 exports.applyJob = async (req, res) => {
   try {
-    const job = await Job.findById(req.params.jobId);
+    const job = await Job.findById(req.params.jobId).populate("postedBy", "name");
     if (!job)
       return res.status(404).json({ success: false, message: "Job not found" });
 
@@ -47,6 +48,15 @@ exports.applyJob = async (req, res) => {
 
     job.applicants.push(req.user._id);
     await job.save();
+
+    // Create notification for job poster
+    await createNotification({
+      recipient: job.postedBy._id,
+      sender: req.user._id,
+      type: "job_application",
+      message: `${req.user.name} applied to your job: "${job.title}"`,
+      relatedJob: job._id,
+    });
 
     res
       .status(200)
@@ -62,7 +72,7 @@ exports.getApplicants = async (req, res) => {
   try {
     const job = await Job.findById(req.params.jobId).populate(
       "applicants",
-      "name email role"
+      "name email role bio skills experience education profilePic"
     );
 
     if (!job)

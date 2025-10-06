@@ -63,129 +63,149 @@ export default function Signup() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-[#05060a] p-6">
-      <div className="w-full max-w-3xl grid grid-cols-1 md:grid-cols-2 gap-6">
+    <div className="min-h-screen flex items-center justify-center bg-slate-100 p-6">
+      <div className="w-full max-w-4xl grid grid-cols-1 md:grid-cols-2 gap-8 bg-white rounded-xl shadow-xl overflow-hidden">
         {/* Left: Form */}
-        <div className="relative rounded-2xl p-8 bg-gradient-to-b from-[#0b0c1a]/50 to-[#01020a]/80 border-2 border-[#0a0a0f] backdrop-blur-md shadow-lg">
-          <h1 className="text-white text-2xl font-bold mb-6">Create Account</h1>
+        <div className="p-8">
+          <h1 className="text-slate-900 text-3xl font-bold mb-2">Join GlobalConnect</h1>
+          <p className="text-slate-600 mb-8">Create your professional account</p>
 
           {error && (
-            <div className="mb-4 text-sm text-rose-400 bg-[rgba(255,0,50,0.05)] border border-rose-500/30 rounded-md p-2">
+            <div className="mb-6 text-sm text-red-600 bg-red-50 border border-red-200 rounded-lg p-3">
               {error}
             </div>
           )}
           {success && (
-            <div className="mb-4 text-sm text-emerald-300 bg-[rgba(0,255,170,0.05)] border border-emerald-300/30 rounded-md p-2">
+            <div className="mb-6 text-sm text-green-600 bg-green-50 border border-green-200 rounded-lg p-3">
               {success}
             </div>
           )}
 
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <input
-              type="text"
-              name="name"
-              placeholder="Full Name"
-              value={form.name}
-              onChange={handleChange}
-              required
-              className="w-full px-3 py-2 rounded-lg bg-[#01020a] border-2 border-cyan-600/40 focus:outline-none focus:ring-2 focus:ring-cyan-500 text-white placeholder:text-slate-400"
-            />
+          <form onSubmit={handleSubmit} className="space-y-6">
+            <div>
+              <label className="block text-slate-700 font-medium mb-2">Full Name</label>
+              <input
+                type="text"
+                name="name"
+                placeholder="Enter your full name"
+                value={form.name}
+                onChange={handleChange}
+                required
+                className="w-full px-4 py-3 rounded-lg bg-slate-50 border border-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-slate-900 placeholder:text-slate-500"
+              />
+            </div>
 
-            <input
-              type="email"
-              name="email"
-              placeholder="Email"
-              value={form.email}
-              onChange={handleChange}
-              required
-              className="w-full px-3 py-2 rounded-lg bg-[#01020a] border-2 border-purple-600/40 focus:outline-none focus:ring-2 focus:ring-purple-500 text-white placeholder:text-slate-400"
-            />
+            <div>
+              <label className="block text-slate-700 font-medium mb-2">Email</label>
+              <input
+                type="email"
+                name="email"
+                placeholder="Enter your email"
+                value={form.email}
+                onChange={handleChange}
+                required
+                className="w-full px-4 py-3 rounded-lg bg-slate-50 border border-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-slate-900 placeholder:text-slate-500"
+              />
+            </div>
 
-            <input
-              type="password"
-              name="password"
-              placeholder="Password"
-              value={form.password}
-              onChange={handleChange}
-              required
-              className="w-full px-3 py-2 rounded-lg bg-[#01020a] border-2 border-red-600/40 focus:outline-none focus:ring-2 focus:ring-red-500 text-white placeholder:text-slate-400"
-            />
-            <p className="text-xs text-slate-400">Min 8 chars · upper/lower · number · special</p>
+            <div>
+              <label className="block text-slate-700 font-medium mb-2">Password</label>
+              <input
+                type="password"
+                name="password"
+                placeholder="Create a strong password"
+                value={form.password}
+                onChange={handleChange}
+                required
+                className="w-full px-4 py-3 rounded-lg bg-slate-50 border border-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-slate-900 placeholder:text-slate-500"
+              />
+              <p className="text-xs text-slate-500 mt-1">Min 8 chars · upper/lower · number · special</p>
+            </div>
 
-            <div className="relative">
+            <div>
+              <label className="block text-slate-700 font-medium mb-2">Account Type</label>
               <select
                 name="role"
                 value={form.role}
                 onChange={handleChange}
-                className="w-full px-3 py-2 rounded-lg bg-[#01020a] border-2 border-white/20 text-white appearance-none focus:outline-none focus:ring-2 focus:ring-cyan-500"
+                className="w-full px-4 py-3 rounded-lg bg-slate-50 border border-slate-300 text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
               >
-                <option className="bg-[#01020a] text-white" value="JobSeeker">
-                  Job Seeker
-                </option>
-                <option className="bg-[#01020a] text-white" value="Employee">
-                  Employer
-                </option>
+                <option value="JobSeeker">Job Seeker</option>
+                <option value="Employee">Employer</option>
               </select>
-              <div className="pointer-events-none absolute inset-y-0 right-3 flex items-center">
-                <svg
-                  className="w-4 h-4 text-white/60"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  viewBox="0 0 24 24"
-                >
-                  <path d="M19 9l-7 7-7-7" strokeLinecap="round" strokeLinejoin="round" />
-                </svg>
-              </div>
             </div>
 
-            <div className="flex items-center gap-3">
-              <label className="flex items-center gap-2 px-3 py-2 rounded-lg cursor-pointer bg-gradient-to-br from-[#06202a]/40 to-[#3a0b35]/30 border-2 border-cyan-500 text-white hover:border-cyan-400 transition">
-                Choose file
-                <input
-                  name="profilePic"
-                  onChange={handleChange}
-                  accept="image/*"
-                  type="file"
-                  className="hidden"
-                />
-              </label>
-              {form.profilePic && (
-                <span className="text-sm text-cyan-300 truncate max-w-xs">
-                  {form.profilePic.name} selected
-                </span>
-              )}
+            <div>
+              <label className="block text-slate-700 font-medium mb-2">Profile Picture (Optional)</label>
+              <div className="flex items-center gap-3">
+                <label className="flex items-center gap-2 px-4 py-3 rounded-lg cursor-pointer bg-slate-50 border border-slate-300 text-slate-700 hover:bg-slate-100 transition">
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                  </svg>
+                  Choose Photo
+                  <input
+                    name="profilePic"
+                    onChange={handleChange}
+                    accept="image/*"
+                    type="file"
+                    className="hidden"
+                  />
+                </label>
+                {form.profilePic && (
+                  <span className="text-sm text-slate-600 truncate max-w-xs">
+                    {form.profilePic.name}
+                  </span>
+                )}
+              </div>
             </div>
 
             <button
               type="submit"
               disabled={loading}
-              className="w-full py-3 rounded-lg font-semibold text-black bg-gradient-to-r from-[#7c3aed] via-[#06b6d4] to-[#ef4444] hover:brightness-105 transition shadow-[0_8px_30px_rgba(124,58,237,0.18)] disabled:opacity-50"
+              className="w-full py-3 rounded-lg font-semibold text-white bg-blue-600 hover:bg-blue-700 transition-colors shadow-lg disabled:opacity-50"
             >
-              {loading ? "Creating account..." : "Create account"}
+              {loading ? "Creating account..." : "Create Account"}
             </button>
           </form>
 
-          <button
-            onClick={googleLogin}
-            className="mt-3 w-full py-3 rounded-lg font-semibold text-black bg-white hover:bg-gray-200 transition flex justify-center items-center gap-2"
-          >
-            <SiGoogle className="w-5 h-5" />
-            Sign in with Google
-          </button>
+          <div className="mt-6">
+            <div className="relative">
+              <div className="absolute inset-0 flex items-center">
+                <div className="w-full border-t border-slate-300"></div>
+              </div>
+              <div className="relative flex justify-center text-sm">
+                <span className="px-2 bg-white text-slate-500">Or continue with</span>
+              </div>
+            </div>
 
-          <p className="mt-4 text-center text-sm text-slate-400">
+            <button
+              onClick={googleLogin}
+              className="mt-4 w-full py-3 rounded-lg font-semibold text-slate-700 bg-white border border-slate-300 hover:bg-slate-50 transition-colors flex justify-center items-center gap-2 shadow-sm"
+            >
+              <SiGoogle className="w-5 h-5 text-red-500" />
+              Sign up with Google
+            </button>
+          </div>
+
+          <p className="mt-8 text-center text-sm text-slate-600">
             Already have an account?{" "}
-            <a href="/login" className="text-cyan-400 underline hover:text-cyan-300">
+            <a href="/login" className="text-blue-600 font-medium hover:text-blue-700">
               Sign in
             </a>
           </p>
         </div>
 
         {/* Right panel */}
-        <div className="rounded-2xl p-6 bg-gradient-to-b from-[#00111a]/60 to-[#0b0222]/40 border-2 border-cyan-600 flex flex-col justify-center items-center text-center text-slate-400">
-          <h2 className="text-lg font-semibold text-white mb-2">Welcome!</h2>
-          <p>Sign up to access your dashboard and manage your profile.</p>
+        <div className="bg-gradient-to-br from-blue-600 to-blue-800 p-8 flex flex-col justify-center items-center text-center text-white">
+          <div className="mb-6">
+            <svg className="w-16 h-16 mx-auto mb-4" fill="currentColor" viewBox="0 0 20 20">
+              <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-6-3a2 2 0 11-4 0 2 2 0 014 0zm-2 4a5 5 0 00-4.546 2.916A5.986 5.986 0 0010 16a5.986 5.986 0 004.546-2.084A5 5 0 0010 11z" clipRule="evenodd" />
+            </svg>
+          </div>
+          <h2 className="text-2xl font-bold mb-4">Start Your Journey</h2>
+          <p className="text-blue-100 leading-relaxed">
+            Connect with professionals, find opportunities, and grow your career in our global network.
+          </p>
         </div>
       </div>
     </div>

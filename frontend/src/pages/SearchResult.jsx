@@ -2,10 +2,11 @@
 import React, { useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
 import axios from "axios";
+import { sendConnectionRequest } from "../api";
 
 export default function SearchResults() {
   const location = useLocation();
-  const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || "http://localhost:5000";
+  const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || "https://netglobalconnect.onrender.com";
   const token = localStorage.getItem("token");
 
   const initialQuery = location.state?.query || "";
@@ -14,6 +15,9 @@ export default function SearchResults() {
   const [sortBy, setSortBy] = useState("");
   const [roleFilter, setRoleFilter] = useState(""); // for users
   const [results, setResults] = useState({});
+  const [connectingUsers, setConnectingUsers] = useState(new Set());
+  const [message, setMessage] = useState("");
+  const [messageType, setMessageType] = useState("success"); // "success" or "error"
 
   const fetchResults = async () => {
     if (!query.trim()) return;
@@ -34,6 +38,28 @@ export default function SearchResults() {
     }
   };
 
+  const handleConnect = async (userId) => {
+    try {
+      setConnectingUsers(prev => new Set([...prev, userId]));
+      await sendConnectionRequest(userId);
+      setMessage("Connection request sent successfully!");
+      setMessageType("success");
+      setTimeout(() => setMessage(""), 3000);
+    } catch (err) {
+      console.error("Connection error:", err);
+      const errorMessage = err.response?.data?.message || "Failed to send connection request";
+      setMessage(errorMessage);
+      setMessageType("error");
+      setTimeout(() => setMessage(""), 5000);
+    } finally {
+      setConnectingUsers(prev => {
+        const newSet = new Set(prev);
+        newSet.delete(userId);
+        return newSet;
+      });
+    }
+  };
+
   useEffect(() => {
     fetchResults();
   }, [query, searchType, sortBy, roleFilter]);
@@ -41,6 +67,16 @@ export default function SearchResults() {
   return (
     <div className="p-4">
       <h2 className="text-2xl font-bold mb-4">Search Results</h2>
+
+      {message && (
+        <div className={`mb-4 p-3 rounded-lg border ${
+          messageType === "success" 
+            ? "bg-green-50 border-green-200 text-green-700" 
+            : "bg-red-50 border-red-200 text-red-700"
+        }`}>
+          {message}
+        </div>
+      )}
 
       {/* Filters */}
       <div className="flex flex-wrap gap-2 mb-4">
@@ -109,19 +145,53 @@ export default function SearchResults() {
 
       {results.users?.length > 0 && (
         <div className="mb-6">
-          <h3 className="font-semibold mb-2">Users</h3>
-          <ul className="space-y-2">
+          <h3 className="text-xl font-semibold text-slate-900 mb-4 flex items-center gap-2">
+            <svg className="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.25 2.25 0 11-4.5 0 2.25 2.25 0 014.5 0z" />
+            </svg>
+            Users
+          </h3>
+          <div className="space-y-3">
             {results.users.map((user) => (
-              <li key={user._id} className="p-3 bg-gray-100 rounded flex items-center gap-3">
-                <img src={user.profilePic || "/default-avatar.png"} alt={user.name} className="w-10 h-10 rounded-full" />
-                <div>
-                  <div className="font-bold">{user.name}</div>
-                  <div className="text-sm text-gray-600">{user.email}</div>
-                  <div className="text-xs text-gray-400">{user.role}</div>
+              <div key={user._id} className="bg-white p-4 rounded-lg shadow-sm border border-slate-200 flex items-center justify-between">
+                <div className="flex items-center gap-4">
+                  <img 
+                    src={user.profilePic?.url || "/default-avatar.png"} 
+                    alt={user.name} 
+                    className="w-12 h-12 rounded-full object-cover border-2 border-slate-200" 
+                  />
+                  <div>
+                    <div className="font-semibold text-slate-900">{user.name}</div>
+                    <div className="text-sm text-slate-600">{user.email}</div>
+                    <div className="text-xs text-blue-600 bg-blue-50 px-2 py-1 rounded-full inline-block mt-1">
+                      {user.role}
+                    </div>
+                  </div>
                 </div>
-              </li>
+                <button
+                  onClick={() => handleConnect(user._id)}
+                  disabled={connectingUsers.has(user._id)}
+                  className="px-4 py-2 bg-blue-600 hover:bg-blue-700 disabled:bg-slate-400 disabled:cursor-not-allowed text-white rounded-lg font-medium transition-colors flex items-center gap-2"
+                >
+                  {connectingUsers.has(user._id) ? (
+                    <>
+                      <svg className="w-4 h-4 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                      </svg>
+                      Connecting...
+                    </>
+                  ) : (
+                    <>
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                      </svg>
+                      Connect
+                    </>
+                  )}
+                </button>
+              </div>
             ))}
-          </ul>
+          </div>
         </div>
       )}
 

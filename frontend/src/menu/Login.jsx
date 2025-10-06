@@ -75,70 +75,95 @@ export default function Login() {
 
     const handleGoogleLogin = () => {
         console.log("Redirecting to Google OAuth...");
-        window.location.href = "http://localhost:5000/api/auth/google";
+        window.location.href = "https://netglobalconnect.onrender.com/api/auth/google";
     };
 
     return (
-        <div className="min-h-screen flex items-center justify-center bg-[#05060a] p-6">
-            <div className="w-full max-w-3xl grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="min-h-screen flex items-center justify-center bg-slate-100 p-6">
+            <div className="w-full max-w-4xl grid grid-cols-1 md:grid-cols-2 gap-8 bg-white rounded-xl shadow-xl overflow-hidden">
                 {/* Left: Form */}
-                <div className="relative rounded-2xl p-8 bg-gradient-to-b from-[#0b0c1a]/50 to-[#01020a]/80 border-2 border-[#0a0a0f] backdrop-blur-md shadow-lg">
-                    <h1 className="text-white text-2xl font-bold mb-6">Sign In</h1>
+                <div className="p-8">
+                    <h1 className="text-slate-900 text-3xl font-bold mb-2">Welcome Back</h1>
+                    <p className="text-slate-600 mb-8">Sign in to your account</p>
 
                     {error && (
-                        <div className="mb-4 text-sm text-rose-400 bg-[rgba(255,0,50,0.05)] border border-rose-500/30 rounded-md p-2">
+                        <div className="mb-6 text-sm text-red-600 bg-red-50 border border-red-200 rounded-lg p-3">
                             {error}
                         </div>
                     )}
 
-                    <form onSubmit={handleSubmit} className="space-y-4">
-                        <input
-                            type="email"
-                            name="email"
-                            placeholder="Email"
-                            value={form.email}
-                            onChange={handleChange}
-                            required
-                            className="w-full px-3 py-2 rounded-lg bg-[#01020a] border-2 border-purple-600/40 focus:outline-none focus:ring-2 focus:ring-purple-500 text-white placeholder:text-slate-400"
-                        />
-                        <input
-                            type="password"
-                            name="password"
-                            placeholder="Password"
-                            value={form.password}
-                            onChange={handleChange}
-                            required
-                            className="w-full px-3 py-2 rounded-lg bg-[#01020a] border-2 border-red-600/40 focus:outline-none focus:ring-2 focus:ring-red-500 text-white placeholder:text-slate-400"
-                        />
+                    <form onSubmit={handleSubmit} className="space-y-6">
+                        <div>
+                            <label className="block text-slate-700 font-medium mb-2">Email</label>
+                            <input
+                                type="email"
+                                name="email"
+                                placeholder="Enter your email"
+                                value={form.email}
+                                onChange={handleChange}
+                                required
+                                className="w-full px-4 py-3 rounded-lg bg-slate-50 border border-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-slate-900 placeholder:text-slate-500"
+                            />
+                        </div>
+                        <div>
+                            <label className="block text-slate-700 font-medium mb-2">Password</label>
+                            <input
+                                type="password"
+                                name="password"
+                                placeholder="Enter your password"
+                                value={form.password}
+                                onChange={handleChange}
+                                required
+                                className="w-full px-4 py-3 rounded-lg bg-slate-50 border border-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-slate-900 placeholder:text-slate-500"
+                            />
+                        </div>
                         <button
                             type="submit"
                             disabled={loading}
-                            className="w-full py-3 rounded-lg font-semibold text-black bg-gradient-to-r from-[#7c3aed] via-[#06b6d4] to-[#ef4444] hover:brightness-105 transition shadow-[0_8px_30px_rgba(124,58,237,0.18)] disabled:opacity-50"
+                            className="w-full py-3 rounded-lg font-semibold text-white bg-blue-600 hover:bg-blue-700 transition-colors shadow-lg disabled:opacity-50"
                         >
-                            {loading ? "Signing in..." : "Sign in"}
+                            {loading ? "Signing in..." : "Sign In"}
                         </button>
                     </form>
 
-                    <button
-                        onClick={handleGoogleLogin}
-                        className="mt-3 w-full py-3 rounded-lg font-semibold text-black bg-white hover:bg-gray-200 transition flex justify-center items-center gap-2"
-                    >
-                        <SiGoogle className="w-5 h-5" />
-                        Sign in with Google
-                    </button>
+                    <div className="mt-6">
+                        <div className="relative">
+                            <div className="absolute inset-0 flex items-center">
+                                <div className="w-full border-t border-slate-300"></div>
+                            </div>
+                            <div className="relative flex justify-center text-sm">
+                                <span className="px-2 bg-white text-slate-500">Or continue with</span>
+                            </div>
+                        </div>
 
-                    <p className="mt-4 text-center text-sm text-slate-400">
+                        <button
+                            onClick={handleGoogleLogin}
+                            className="mt-4 w-full py-3 rounded-lg font-semibold text-slate-700 bg-white border border-slate-300 hover:bg-slate-50 transition-colors flex justify-center items-center gap-2 shadow-sm"
+                        >
+                            <SiGoogle className="w-5 h-5 text-red-500" />
+                            Sign in with Google
+                        </button>
+                    </div>
+
+                    <p className="mt-8 text-center text-sm text-slate-600">
                         Don't have an account?{" "}
-                        <a href="/signup" className="text-cyan-400 underline hover:text-cyan-300">
+                        <a href="/signup" className="text-blue-600 font-medium hover:text-blue-700">
                             Sign up
                         </a>
                     </p>
                 </div>
 
                 {/* Right panel */}
-                <div className="rounded-2xl p-6 bg-gradient-to-b from-[#00111a]/60 to-[#0b0222]/40 border-2 border-cyan-600 flex flex-col justify-center items-center text-center text-slate-400">
-                    <h2 className="text-lg font-semibold text-white mb-2">Welcome Back!</h2>
-                    <p>Sign in to access your dashboard and manage your profile.</p>
+                <div className="bg-gradient-to-br from-blue-600 to-blue-800 p-8 flex flex-col justify-center items-center text-center text-white">
+                    <div className="mb-6">
+                        <svg className="w-16 h-16 mx-auto mb-4" fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M13 6a3 3 0 11-6 0 3 3 0 016 0zM18 8a2 2 0 11-4 0 2 2 0 014 0zM14 15a4 4 0 00-8 0v3h8v-3z" />
+                        </svg>
+                    </div>
+                    <h2 className="text-2xl font-bold mb-4">Connect & Grow</h2>
+                    <p className="text-blue-100 leading-relaxed">
+                        Join thousands of professionals who are building their careers and expanding their networks on GlobalConnect.
+                    </p>
                 </div>
             </div>
         </div>

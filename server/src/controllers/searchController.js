@@ -36,9 +36,13 @@ const unifiedSearch = async (req, res) => {
 
     // ===== Posts =====
     if (!type || type === "posts") {
-      // Populate 'userId' instead of 'author'
-
-     
+      // Initialize post query
+      let postQuery = Post.find({
+        $or: [
+          { content: searchRegex },
+          { title: searchRegex }
+        ]
+      }).populate('userId', 'name profilePic');
 
       // Sorting
       if (sortBy === "date") {

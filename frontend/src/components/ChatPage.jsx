@@ -9,13 +9,14 @@ export default function ChatPage() {
     const { id: otherUserId } = useParams();
     const [messages, setMessages] = useState([]);
     const [newMessage, setNewMessage] = useState("");
+    const [isSending, setIsSending] = useState(false);
     const [myId, setMyId] = useState(null);
     const [myName, setMyName] = useState("");
     const [otherUserName, setOtherUserName] = useState("");
     const messagesEndRef = useRef(null);
     const socketRef = useRef(null);
 
-    const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || "http://localhost:5000";
+    const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || "https://netglobalconnect.onrender.com";
     const token = localStorage.getItem("token");
 
     // Scroll to bottom
@@ -87,9 +88,11 @@ export default function ChatPage() {
 
     // Send message
     const handleSendMessage = async () => {
-        if (!newMessage.trim()) return;
+        if (!newMessage.trim() || isSending) return;
+        
         const content = newMessage;
         setNewMessage("");
+        setIsSending(true);
 
         // Optimistic local message
         const tempMessage = {
@@ -122,39 +125,58 @@ export default function ChatPage() {
             }
         } catch (err) {
             console.error("Send failed:", err);
+            // Remove temp message on error
+            setMessages((prev) => prev.filter((m) => m._id !== tempMessage._id));
+        } finally {
+            setIsSending(false);
         }
     };
 
     return (
-        <div className="flex flex-col h-screen bg-black text-white p-4">
-            <h2 className="text-xl font-bold mb-4 border-b border-gray-700 pb-2">
-                Chat with {otherUserName}
-            </h2>
+        <div className="flex flex-col h-full bg-slate-50 text-slate-800">
+            <div className="bg-white border-b border-slate-200 p-4 shadow-sm">
+                <h2 className="text-xl font-bold text-slate-900 flex items-center gap-2">
+                    <svg className="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-3.582 8-8 8a8.955 8.955 0 01-2.172-.274c-.47-.117-.888-.436-1.337-.568-.404-.12-.844-.046-1.298.064C7.34 19.58 6.7 19.5 6.14 19.14c-.56-.36-1.14-.9-1.14-1.64 0-.74.58-1.28 1.14-1.64.56-.36 1.2-.44 1.86-.18.654.26 1.294.196 1.898-.064A8.955 8.955 0 0112 4c4.418 0 8 3.582 8 8z" />
+                    </svg>
+                    Chat with {otherUserName}
+                </h2>
+            </div>
 
             {/* Messages */}
-            <div className="flex-1 overflow-y-auto mb-4 px-2 py-2 rounded bg-gray-900 flex flex-col">
+            <div className="flex-1 overflow-y-auto p-4 flex flex-col gap-2">
                 {messages.length === 0 ? (
-                    <p className="text-gray-400 text-sm text-center mt-4">No messages yet.</p>
+                    <div className="text-center py-12">
+                        <svg className="w-16 h-16 text-slate-400 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-3.582 8-8 8a8.955 8.955 0 01-2.172-.274c-.47-.117-.888-.436-1.337-.568-.404-.12-.844-.046-1.298.064C7.34 19.58 6.7 19.5 6.14 19.14c-.56-.36-1.14-.9-1.14-1.64 0-.74.58-1.28 1.14-1.64.56-.36 1.2-.44 1.86-.18.654.26 1.294.196 1.898-.064A8.955 8.955 0 0112 4c4.418 0 8 3.582 8 8z" />
+                        </svg>
+                        <p className="text-slate-500 text-lg">No messages yet.</p>
+                        <p className="text-slate-400 text-sm mt-2">Start the conversation!</p>
+                    </div>
                 ) : (
                     messages.map((msg) => {
                         const isMe = msg.senderId === myId;
                         return (
                             <div
                                 key={msg._id}
-                                className={`my-1 p-2 rounded max-w-xs break-words ${isMe
-                                        ? "bg-blue-500 self-end text-right ml-auto"
-                                        : "bg-gray-700 self-start text-left mr-auto"
-                                    }`}
+                                className={`flex ${isMe ? 'justify-end' : 'justify-start'}`}
                             >
-                                <p className="font-semibold text-sm mb-1">
-                                    {isMe ? myName : otherUserName}
-                                </p>
-                                {msg.content}
-                                <div className="text-xs text-gray-300 mt-1">
-                                    {new Date(msg.timestamp).toLocaleTimeString([], {
-                                        hour: "2-digit",
-                                        minute: "2-digit",
-                                    })}
+                                <div
+                                    className={`max-w-xs px-4 py-2 rounded-lg break-words ${isMe
+                                            ? "bg-blue-600 text-white"
+                                            : "bg-white text-slate-800 border border-slate-200"
+                                        }`}
+                                >
+                                    <p className="font-medium text-xs mb-1 opacity-75">
+                                        {isMe ? myName : otherUserName}
+                                    </p>
+                                    <p>{msg.content}</p>
+                                    <div className={`text-xs mt-1 ${isMe ? 'text-blue-200' : 'text-slate-500'}`}>
+                                        {new Date(msg.timestamp).toLocaleTimeString([], {
+                                            hour: "2-digit",
+                                            minute: "2-digit",
+                                        })}
+                                    </div>
                                 </div>
                             </div>
                         );
@@ -164,21 +186,24 @@ export default function ChatPage() {
             </div>
 
             {/* Input */}
-            <div className="flex gap-2">
-                <input
-                    type="text"
-                    placeholder="Type a message..."
-                    value={newMessage}
-                    onChange={(e) => setNewMessage(e.target.value)}
-                    onKeyDown={(e) => e.key === "Enter" && handleSendMessage()}
-                    className="flex-1 px-3 py-2 rounded bg-gray-800 border border-gray-600 focus:outline-none"
-                />
-                <button
-                    onClick={handleSendMessage}
-                    className="bg-blue-500 px-4 py-2 rounded hover:bg-blue-600 transition"
-                >
-                    Send
-                </button>
+            <div className="bg-white border-t border-slate-200 p-4">
+                <div className="flex gap-2">
+                    <input
+                        type="text"
+                        placeholder="Type a message..."
+                        value={newMessage}
+                        onChange={(e) => setNewMessage(e.target.value)}
+                        onKeyDown={(e) => e.key === "Enter" && handleSendMessage()}
+                        className="flex-1 p-3 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    />
+                    <button
+                        onClick={handleSendMessage}
+                        disabled={isSending || !newMessage.trim()}
+                        className="bg-blue-600 hover:bg-blue-700 disabled:bg-slate-400 disabled:cursor-not-allowed text-white px-6 py-3 rounded-lg font-medium transition-colors"
+                    >
+                        {isSending ? "Sending..." : "Send"}
+                    </button>
+                </div>
             </div>
         </div>
     );

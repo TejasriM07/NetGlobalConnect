@@ -3,25 +3,35 @@ const User = require("../models/User");
 // Send connection request
 const sendConnectionRequest = async (req, res) => {
   try {
-    const targetUser = await User.findById(req.params.id);
-    if (!targetUser) return res.status(404).json({ message: "User not found" });
-
-    // Already connected or requested
-    if (
-      targetUser.connections.includes(req.user._id) ||
-      targetUser.connectionRequests.includes(req.user._id)
-    ) {
-      return res
-        .status(400)
-        .json({ message: "Already connected or requested" });
+    const targetUserId = req.params.id;
+    
+    // Prevent users from connecting to themselves
+    if (targetUserId === req.user._id.toString()) {
+      return res.status(400).json({ message: "Cannot connect to yourself" });
     }
 
+    const targetUser = await User.findById(targetUserId);
+    if (!targetUser) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    // Check if already connected
+    if (targetUser.connections.includes(req.user._id)) {
+      return res.status(400).json({ message: "Already connected" });
+    }
+
+    // Check if request already sent
+    if (targetUser.connectionRequests.includes(req.user._id)) {
+      return res.status(400).json({ message: "Connection request already sent" });
+    }
+
+    // Add connection request
     targetUser.connectionRequests.push(req.user._id);
     await targetUser.save();
 
-    res.status(200).json({ message: "Connection request sent" });
+    res.status(200).json({ message: "Connection request sent successfully" });
   } catch (err) {
-    console.error(err);
+    console.error("Connection request error:", err);
     res.status(500).json({ message: "Server Error" });
   }
 };

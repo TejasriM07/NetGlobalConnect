@@ -1,12 +1,14 @@
-// src/components/Navbar.jsx
 import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { getConnectionRequests } from "../api";
 
 export default function Navbar() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [userRole, setUserRole] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
   const [menuOpen, setMenuOpen] = useState(false); // for mobile
+  const [pendingRequests, setPendingRequests] = useState(0);
+  const [unreadNotifications, setUnreadNotifications] = useState(0);
   const navigate = useNavigate();
   const token = localStorage.getItem("token");
 
@@ -14,7 +16,46 @@ export default function Navbar() {
     const role = localStorage.getItem("userRole") || "";
     setIsLoggedIn(!!token);
     setUserRole(role);
+    
+    // Fetch pending connection requests
+    if (token) {
+      fetchPendingRequests();
+      fetchUnreadNotifications();
+      // Set up periodic check for new requests and notifications
+      const interval = setInterval(() => {
+        fetchPendingRequests();
+        fetchUnreadNotifications();
+      }, 30000); // Check every 30 seconds
+      return () => clearInterval(interval);
+    }
   }, [token]);
+
+  const fetchPendingRequests = async () => {
+    try {
+      const res = await getConnectionRequests();
+      setPendingRequests(res.data.requests?.length || 0);
+    } catch (err) {
+      console.error("Failed to fetch connection requests:", err);
+    }
+  };
+
+  const fetchUnreadNotifications = async () => {
+    try {
+      const response = await fetch('https://netglobalconnect.onrender.com/api/notifications/unread-count', {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        setUnreadNotifications(data.count || 0);
+      }
+    } catch (err) {
+      console.error("Failed to fetch unread notifications:", err);
+    }
+  };
 
   const handleLogout = () => {
     localStorage.clear();
@@ -29,13 +70,13 @@ export default function Navbar() {
   };
 
   return (
-    <nav className="bg-gray-900 text-white shadow-md">
+    <nav className="bg-white text-slate-800 shadow-lg border-b border-slate-200">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-16 items-center">
           {/* Left - App Name */}
           <div className="flex-shrink-0">
-            <Link to="/" className="font-bold text-xl">
-              Connect
+            <Link to="/" className="font-bold text-xl text-blue-600">
+              GlobalConnect
             </Link>
           </div>
 
@@ -48,14 +89,14 @@ export default function Navbar() {
     >
       <input
         type="text"
-        placeholder="Search..."
+        placeholder="Search users, posts, jobs..."
         value={searchQuery}
         onChange={(e) => setSearchQuery(e.target.value)}
-        className="flex-1 px-4 py-1 rounded-l bg-gray-200 text-black focus:outline-none w-full"
+        className="flex-1 px-4 py-2 rounded-l-lg bg-slate-100 text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500 border border-slate-300 w-full"
       />
       <button
         type="submit"
-        className="ml-2 bg-cyan-500 hover:bg-cyan-600 px-3 sm:px-4 py-1 rounded-r text-white whitespace-nowrap"
+        className="ml-2 bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded-r-lg text-white whitespace-nowrap transition-colors"
       >
         Search
       </button>
@@ -68,36 +109,54 @@ export default function Navbar() {
           <div className="hidden md:flex items-center gap-4">
             {!isLoggedIn ? (
               <>
-                <Link to="/login" className="hover:text-cyan-400">
+                <Link to="/login" className="hover:text-blue-600 transition-colors">
                   Login
                 </Link>
-                <Link to="/signup" className="hover:text-cyan-400">
-                  Signup
+                <Link to="/signup" className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition-colors">
+                  Sign Up
                 </Link>
               </>
             ) : (
               <>
-                <Link to="/profile" className="hover:text-cyan-400">
+                <Link to="/profile" className="hover:text-blue-600 transition-colors flex items-center gap-1">
                   Profile
+                  {pendingRequests > 0 && (
+                    <span className="bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
+                      {pendingRequests}
+                    </span>
+                  )}
+                </Link>
+
+                <Link to="/feed" className="hover:text-blue-600 transition-colors">
+                  Posts
                 </Link>
 
                 {userRole === "JobSeeker" ? (
-                  <Link to="/jobs" className="hover:text-green-400">
-                    Apply Jobs
+                  <Link to="/jobs" className="hover:text-green-600 transition-colors">
+                    Find Jobs
                   </Link>
                 ) : (
                   <>
-                    <Link to="/jobs" className="hover:text-yellow-400">
-                      View Jobs
+                    <Link to="/jobs" className="hover:text-blue-600 transition-colors">
+                      Manage Jobs
                     </Link>
                   </>
                 )}
 
-                <Link to="/messages" className="hover:text-yellow-400">
-                  Inbox
+                <Link to="/messages" className="hover:text-blue-600 transition-colors">
+                  Messages
                 </Link>
 
-                <button onClick={handleLogout} className="hover:text-red-400">
+                <Link to="/notifications" className="hover:text-blue-600 transition-colors flex items-center gap-1">
+                  Notifications
+                  {unreadNotifications > 0 && (
+                    <span className="bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
+                      {unreadNotifications}
+                    </span>
+                  )}
+                </Link>
+
+                <button onClick={handleLogout} className="hover:text-red-600 transition-colors">
                   Logout
                 </button>
               </>
@@ -151,8 +210,17 @@ export default function Navbar() {
             </>
           ) : (
             <>
-              <Link to="/profile" className="block px-3 py-2 rounded hover:bg-gray-700">
+              <Link to="/profile" className="block px-3 py-2 rounded hover:bg-gray-700 flex items-center gap-2">
                 Profile
+                {pendingRequests > 0 && (
+                  <span className="bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
+                    {pendingRequests}
+                  </span>
+                )}
+              </Link>
+
+              <Link to="/feed" className="block px-3 py-2 rounded hover:bg-gray-700">
+                Posts
               </Link>
 
               {userRole === "JobSeeker" ? (
@@ -169,6 +237,15 @@ export default function Navbar() {
 
               <Link to="/messages" className="block px-3 py-2 rounded hover:bg-gray-700">
                 Inbox
+              </Link>
+
+              <Link to="/notifications" className="block px-3 py-2 rounded hover:bg-gray-700 flex items-center gap-2">
+                Notifications
+                {unreadNotifications > 0 && (
+                  <span className="bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
+                    {unreadNotifications}
+                  </span>
+                )}
               </Link>
 
               <button

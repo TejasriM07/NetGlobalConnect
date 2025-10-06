@@ -1,4 +1,5 @@
-require("dotenv").config();
+const path = require('path');
+require('dotenv').config({ path: path.resolve(__dirname, '.env') });
 require("express-async-errors");
 const express = require("express");
 const cors = require("cors");
@@ -10,13 +11,18 @@ const userRoutes = require("./src/routes/userRoutes");
 const feedRoutes = require("./src/routes/feedRoutes");
 const postRoutes = require("./src/routes/postRoutes");
 const searchRoutes = require("./src/routes/searchRoutes");
+const notificationRoutes = require("./src/routes/notificationRoutes");
 require("./src/services/googleAuthService");
 
 const app = express();
 
 app.use(
   cors({
-    origin: process.env.FRONTEND_URL || "*",
+    origin: [
+      "https://net-global-connect.netlify.app",
+      process.env.FRONTEND_URL
+    ].filter(Boolean),
+    credentials: true,
   })
 );
 app.use(express.json());
@@ -31,6 +37,7 @@ app.use("/api/jobs", jobRoutes);
 app.use("/api/posts/feed", feedRoutes);
 app.use("/api/posts", postRoutes);
 app.use("/api/search", searchRoutes);
+app.use("/api/notifications", notificationRoutes);
 app.use(
   "/api/users/connections",
   require("./src/routes/userConnectionsRoutes")

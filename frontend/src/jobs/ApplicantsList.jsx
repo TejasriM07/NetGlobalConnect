@@ -42,66 +42,89 @@ export default function ApplicantsList() {
         );
 
     return (
-        <div className="min-h-screen bg-black p-6">
-            <h2 className="text-3xl font-bold text-white mb-8 text-center">
-                Applicants for: {jobTitle}
-            </h2>
+        <div className="min-h-screen bg-slate-50 p-6">
+            <div className="max-w-6xl mx-auto">
+                <h2 className="text-3xl font-bold text-slate-900 mb-8 text-center">
+                    Applicants for: <span className="text-blue-600">{jobTitle}</span>
+                </h2>
 
-            {applicants.length === 0 ? (
-                <p className="text-gray-400 text-center text-lg">No applicants yet.</p>
-            ) : (
-                <div className="grid md:grid-cols-2 gap-6 max-w-5xl mx-auto">
-                    {applicants.map((a) => (
-                        <div
-                            key={a._id}
-                            onClick={() => navigate(`/users/${a._id}`)} // 👈 Navigate to applicant profile
-                            className="bg-black/60 backdrop-blur-md border border-purple-600 rounded-2xl p-6 shadow-lg hover:shadow-xl transition transform hover:-translate-y-1 cursor-pointer"
-                        >
-                            <div className="flex flex-col gap-2">
-                                <h3 className="text-xl font-semibold text-white">{a.name}</h3>
-                                <p className="text-purple-300 font-medium">
-                                    {a.role || "Applicant"}
-                                </p>
-                                <p className="text-gray-400 text-sm">{a.email}</p>
-                                {a.phone && (
-                                    <p className="text-gray-400 text-sm">Phone: {a.phone}</p>
-                                )}
-                                {a.location && (
-                                    <p className="text-gray-400 text-sm">Location: {a.location}</p>
-                                )}
-                                {a.experience && (
-                                    <p className="text-gray-400 text-sm">
-                                        Experience: {a.experience} years
-                                    </p>
-                                )}
-                                {a.skills && a.skills.length > 0 && (
-                                    <div className="flex flex-wrap gap-2 mt-2">
-                                        {a.skills.map((skill) => (
-                                            <span
-                                                key={skill}
-                                                className="px-2 py-1 text-xs font-semibold rounded-full bg-purple-800/30 text-purple-200 backdrop-blur-sm"
-                                            >
-                                                {skill}
-                                            </span>
-                                        ))}
+                {applicants.length === 0 ? (
+                    <div className="text-center py-12">
+                        <p className="text-slate-500 text-lg">No applicants yet.</p>
+                    </div>
+                ) : (
+                    <div className="grid md:grid-cols-2 gap-6">
+                        {applicants.map((a) => (
+                            <div
+                                key={a._id}
+                                onClick={() => navigate(`/users/${a._id}`)}
+                                className="bg-white border border-slate-200 rounded-xl p-6 shadow-lg hover:shadow-xl transition transform hover:-translate-y-1 cursor-pointer hover:border-blue-300"
+                            >
+                                <div className="flex flex-col gap-2">
+                                    <div className="flex items-center gap-3 mb-3">
+                                        <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-blue-600 rounded-full flex items-center justify-center text-white font-semibold text-lg">
+                                            {a.name.charAt(0).toUpperCase()}
+                                        </div>
+                                        <div>
+                                            <h3 className="text-xl font-semibold text-slate-900">{a.name}</h3>
+                                            <p className="text-blue-600 font-medium">
+                                                {a.role || "Job Seeker"}
+                                            </p>
+                                        </div>
                                     </div>
-                                )}
-                                {a.resume && (
-                                    <a
-                                        href={a.resume}
-                                        target="_blank"
-                                        rel="noopener noreferrer"
-                                        onClick={(e) => e.stopPropagation()} // 👈 prevent navigating to profile if resume clicked
-                                        className="text-cyan-400 hover:text-cyan-300 text-sm mt-2 underline"
-                                    >
-                                        View Resume
-                                    </a>
-                                )}
+                                    <p className="text-slate-600 text-sm">{a.email}</p>
+                                    {a.bio && (
+                                        <p className="text-slate-600 text-sm mb-2">{a.bio}</p>
+                                    )}
+                                    {a.experience && a.experience.length > 0 && (
+                                        <div className="mb-2">
+                                            <p className="text-blue-600 text-sm font-semibold">Experience:</p>
+                                            {a.experience.map((exp, idx) => (
+                                                <p key={idx} className="text-slate-600 text-xs">
+                                                    {exp.role} at {exp.company}
+                                                </p>
+                                            ))}
+                                        </div>
+                                    )}
+                                    {a.education && a.education.length > 0 && (
+                                        <div className="mb-2">
+                                            <p className="text-blue-600 text-sm font-semibold">Education:</p>
+                                            {a.education.map((edu, idx) => (
+                                                <p key={idx} className="text-slate-600 text-xs">
+                                                    {edu.degree} from {edu.school}
+                                                </p>
+                                            ))}
+                                        </div>
+                                    )}
+                                    {a.skills && a.skills.length > 0 && (
+                                        <div className="flex flex-wrap gap-2 mt-2">
+                                            {a.skills.map((skill, idx) => (
+                                                <span
+                                                    key={idx}
+                                                    className="px-2 py-1 text-xs font-semibold rounded-full bg-blue-100 text-blue-800"
+                                                >
+                                                    {skill}
+                                                </span>
+                                            ))}
+                                        </div>
+                                    )}
+                                    {a.resume && (
+                                        <a
+                                            href={a.resume}
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            onClick={(e) => e.stopPropagation()}
+                                            className="text-blue-600 hover:text-blue-700 text-sm mt-2 underline"
+                                        >
+                                            View Resume
+                                        </a>
+                                    )}
+                                </div>
                             </div>
-                        </div>
-                    ))}
-                </div>
-            )}
+                        ))}
+                    </div>
+                )}
+            </div>
         </div>
     );
 }

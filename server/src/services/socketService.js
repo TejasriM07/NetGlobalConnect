@@ -7,7 +7,10 @@ let io;
 const initSocket = (server) => {
   io = new Server(server, {
     cors: {
-      origin: process.env.FRONTEND_URL || "*",
+      origin: [
+        "https://net-global-connect.netlify.app",
+        process.env.FRONTEND_URL
+      ].filter(Boolean),
       methods: ["GET", "POST"],
     },
   });
