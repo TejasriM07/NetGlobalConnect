@@ -9,6 +9,7 @@ const initSocket = (server) => {
     cors: {
       origin: [
         "https://net-global-connect.netlify.app",
+        "https://playful-raindrop-fed49f.netlify.app",
         process.env.FRONTEND_URL
       ].filter(Boolean),
       methods: ["GET", "POST"],

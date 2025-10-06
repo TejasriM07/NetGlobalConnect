@@ -114,11 +114,11 @@ export default function SearchResults() {
           <h3 className="font-semibold mb-2">Jobs</h3>
           <ul className="space-y-2">
             {results.jobs.map((job) => (
-              <li key={job._id} className="p-3 bg-gray-100 rounded">
-                <div className="font-bold">{job.title}</div>
-                <div>{job.description}</div>
-                <div className="text-sm text-gray-600">{job.company}</div>
-                <div className="text-xs text-gray-400">{new Date(job.createdAt).toLocaleString()}</div>
+              <li key={job._id} className="p-3 bg-slate-50 border border-slate-200 rounded">
+                <div className="font-bold text-slate-900">{job.title}</div>
+                <div className="text-slate-700">{job.description}</div>
+                <div className="text-sm text-slate-600">{job.company}</div>
+                <div className="text-xs text-slate-500">{new Date(job.createdAt).toLocaleString()}</div>
               </li>
             ))}
           </ul>
@@ -130,13 +130,13 @@ export default function SearchResults() {
           <h3 className="font-semibold mb-2">Posts</h3>
           <ul className="space-y-2">
             {results.posts.map((post) => (
-              <li key={post._id} className="p-3 bg-gray-100 rounded">
-                <div className="font-bold">{post.author?.name || "Unknown"}</div>
-                <div>{post.content}</div>
-                <div className="text-sm text-gray-600">
+              <li key={post._id} className="p-3 bg-slate-50 border border-slate-200 rounded">
+                <div className="font-bold text-slate-900">{post.author?.name || "Unknown"}</div>
+                <div className="text-slate-700">{post.content}</div>
+                <div className="text-sm text-slate-600">
                   Likes: {post.likesCount} | Comments: {post.commentsCount}
                 </div>
-                <div className="text-xs text-gray-400">{new Date(post.createdAt).toLocaleString()}</div>
+                <div className="text-xs text-slate-500">{new Date(post.createdAt).toLocaleString()}</div>
               </li>
             ))}
           </ul>

@@ -16,6 +16,7 @@ import CreateJob from "./jobs/CreateJob";
 import ApplicantsList from "./jobs/ApplicantsList";
 import SearchResults from "./pages/SearchResult";
 import Notifications from "./pages/Notifications";
+import TokenHandler from "./pages/TokenHandler";
 
 export default function App() {
   return (
@@ -83,7 +84,7 @@ export default function App() {
           path="/"
           element={
             <PrivateRoute>
-              <Feed />
+              <TokenHandler />
             </PrivateRoute>
           }
         />

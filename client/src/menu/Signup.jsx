@@ -53,8 +53,8 @@ export default function Signup() {
         console.warn("Failed to fetch profile after signup", err);
       }
 
-      // redirect to profile
-      navigate("/profile");
+      // redirect to main feed page
+      navigate("/");
     } catch (err) {
       setError(err.response?.data?.message || "Something went wrong");
     } finally {

@@ -29,10 +29,10 @@ export default function Login() {
                         localStorage.setItem("userRole", meData.role || "");
                         localStorage.setItem("userId", meData._id || meData.id || "");
                     }
-                    navigate("/profile");
+                    navigate("/");
                 })
                 .catch((err) => {
-                    navigate("/profile");
+                    navigate("/");
                 })
                 .finally(() => setLoading(false));
         }
@@ -64,7 +64,7 @@ export default function Login() {
                 console.warn("Failed to fetch profile after login", err);
             }
 
-            navigate("/profile");
+            navigate("/");
         } catch (err) {
             console.error("Login error:", err);
             setError(err.response?.data?.message || "Something went wrong");

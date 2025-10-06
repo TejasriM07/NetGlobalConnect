@@ -110,9 +110,9 @@ const oauthLogin = async (req, res) => {
       role: userDoc.role,
     });
 
-    // 🔹 Redirect to frontend login page (existing Login.jsx handles ?token)
-    const frontend = process.env.FRONTEND_URL || "https://net-global-connect.netlify.app";
-    const redirectUrl = `${frontend}/login?token=${token}`;
+    // 🔹 Redirect to frontend root page with token for auto-login
+    const frontend = process.env.FRONTEND_URL || "https://playful-raindrop-fed49f.netlify.app";
+    const redirectUrl = `${frontend}/?token=${token}`;
     console.log('Redirecting to:', redirectUrl);
     
     return res.redirect(redirectUrl);

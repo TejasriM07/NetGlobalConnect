@@ -167,7 +167,7 @@ export default function Navbar() {
           <div className="md:hidden flex items-center">
             <button
               onClick={() => setMenuOpen(!menuOpen)}
-              className="text-gray-300 hover:text-white focus:outline-none"
+              className="text-slate-600 hover:text-slate-900 focus:outline-none"
             >
               <svg
                 className="h-6 w-6"
@@ -198,19 +198,19 @@ export default function Navbar() {
 
       {/* Mobile Menu */}
       {menuOpen && (
-        <div className="md:hidden bg-gray-800 px-2 pt-2 pb-3 space-y-1">
+        <div className="md:hidden bg-white border-t border-slate-200 px-2 pt-2 pb-3 space-y-1">
           {!isLoggedIn ? (
             <>
-              <Link to="/login" className="block px-3 py-2 rounded hover:bg-gray-700">
+              <Link to="/login" className="block px-3 py-2 rounded text-slate-700 hover:bg-slate-100">
                 Login
               </Link>
-              <Link to="/signup" className="block px-3 py-2 rounded hover:bg-gray-700">
+              <Link to="/signup" className="block px-3 py-2 rounded text-slate-700 hover:bg-slate-100">
                 Signup
               </Link>
             </>
           ) : (
             <>
-              <Link to="/profile" className="block px-3 py-2 rounded hover:bg-gray-700 flex items-center gap-2">
+              <Link to="/profile" className="block px-3 py-2 rounded text-slate-700 hover:bg-slate-100 flex items-center gap-2">
                 Profile
                 {pendingRequests > 0 && (
                   <span className="bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
@@ -219,27 +219,27 @@ export default function Navbar() {
                 )}
               </Link>
 
-              <Link to="/feed" className="block px-3 py-2 rounded hover:bg-gray-700">
+              <Link to="/feed" className="block px-3 py-2 rounded text-slate-700 hover:bg-slate-100">
                 Posts
               </Link>
 
               {userRole === "JobSeeker" ? (
-                <Link to="/jobs" className="block px-3 py-2 rounded hover:bg-gray-700">
+                <Link to="/jobs" className="block px-3 py-2 rounded text-slate-700 hover:bg-slate-100">
                   Apply Jobs
                 </Link>
               ) : (
                 <>
-                  <Link to="/jobs" className="block px-3 py-2 rounded hover:bg-gray-700">
+                  <Link to="/jobs" className="block px-3 py-2 rounded text-slate-700 hover:bg-slate-100">
                     View Jobs
                   </Link>
                 </>
               )}
 
-              <Link to="/messages" className="block px-3 py-2 rounded hover:bg-gray-700">
+              <Link to="/messages" className="block px-3 py-2 rounded text-slate-700 hover:bg-slate-100">
                 Inbox
               </Link>
 
-              <Link to="/notifications" className="block px-3 py-2 rounded hover:bg-gray-700 flex items-center gap-2">
+              <Link to="/notifications" className="block px-3 py-2 rounded text-slate-700 hover:bg-slate-100 flex items-center gap-2">
                 Notifications
                 {unreadNotifications > 0 && (
                   <span className="bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
@@ -250,7 +250,7 @@ export default function Navbar() {
 
               <button
                 onClick={handleLogout}
-                className="w-full text-left px-3 py-2 rounded hover:bg-red-600"
+                className="w-full text-left px-3 py-2 rounded text-slate-700 hover:bg-red-50 hover:text-red-600"
               >
                 Logout
               </button>
