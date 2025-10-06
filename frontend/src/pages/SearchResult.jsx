@@ -1,12 +1,13 @@
 // src/pages/SearchResults.jsx
 import React, { useEffect, useState } from "react";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { sendConnectionRequest, applyToJob } from "../api";
 import defaultAvatar from "../assets/default.jpeg";
 import axios from "axios";
 
 export default function SearchResults() {
   const location = useLocation();
+  const navigate = useNavigate();
   const BACKEND_HOST =
     import.meta.env.VITE_BACKEND_URL || "https://netglobalconnect.onrender.com";
   const API_BASE = `${BACKEND_HOST.replace(/\/$/, "")}/api`;
@@ -20,12 +21,14 @@ export default function SearchResults() {
   const [connectingUserId, setConnectingUserId] = useState("");
   const [sentRequests, setSentRequests] = useState(new Set());
   const [applyingJobId, setApplyingJobId] = useState("");
-const [appliedJobsSet, setAppliedJobsSet] = useState(new Set());
+  const [appliedJobsSet, setAppliedJobsSet] = useState(new Set());
+  const [connectedUsers, setConnectedUsers] = useState(new Set()); // connected users
 
   // modal states
   const [selectedUser, setSelectedUser] = useState(null);
   const [selectedJob, setSelectedJob] = useState(null);
 
+  // Fetch search results
   const fetchResults = async () => {
     if (!query.trim()) return;
     try {
@@ -39,8 +42,10 @@ const [appliedJobsSet, setAppliedJobsSet] = useState(new Set());
         headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
       });
 
-      setResults(res.data);
-    } catch (err) {}
+      setResults(res.data || {});
+    } catch (err) {
+      console.error("Search failed:", err);
+    }
   };
 
   useEffect(() => {
@@ -59,6 +64,68 @@ const [appliedJobsSet, setAppliedJobsSet] = useState(new Set());
       setAppliedJobsSet(new Set(arr));
     } catch {}
   }, []);
+
+  // Fetch connected users
+  useEffect(() => {
+    const fetchConnectedUsers = async () => {
+      try {
+        const res = await axios.get(`${API_BASE}/users/connections/connections`, {
+          headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+        });
+        if (res.data?.success) {
+          setConnectedUsers(new Set(res.data.data.map((user) => user._id)));
+        }
+      } catch (err) {
+        console.error("Failed to fetch connected users", err);
+      }
+    };
+    fetchConnectedUsers();
+  }, []);
+
+  // Apply to job
+  const handleApplyJob = async (jobId) => {
+    if (appliedJobsSet.has(jobId)) {
+      alert("You have already applied to this job.");
+      return;
+    }
+    try {
+      setApplyingJobId(jobId);
+      await applyToJob(jobId);
+      setAppliedJobsSet((prev) => {
+        const newSet = new Set(prev);
+        newSet.add(jobId);
+        localStorage.setItem("appliedJobs", JSON.stringify(Array.from(newSet)));
+        return newSet;
+      });
+    } catch (err) {
+      console.error("Failed to apply to job:", err);
+    } finally {
+      setApplyingJobId("");
+    }
+  };
+
+  // Send connection request
+  const handleConnectUser = async (userId) => {
+    if (connectedUsers.has(userId)) {
+      alert("You are already connected with this user.");
+      return;
+    }
+    if (sentRequests.has(userId)) {
+      alert("Connection request already sent.");
+      return;
+    }
+
+    try {
+      setConnectingUserId(userId);
+      await sendConnectionRequest(userId);
+      setSentRequests((prev) => new Set([...Array.from(prev), userId]));
+    } catch (err) {
+      console.error("Failed to send connection request:", err);
+      alert(err.response?.data?.message || "Failed to send request");
+    } finally {
+      setConnectingUserId("");
+    }
+  };
 
   return (
     <div className="min-h-screen bg-white text-gray-900 p-4">
@@ -116,10 +183,10 @@ const [appliedJobsSet, setAppliedJobsSet] = useState(new Set());
                 key={job._id}
                 className="p-3 bg-gray-100 rounded flex items-start justify-between gap-3"
               >
-                <div className="font-bold">{job.title}</div>
+                <div className="font-bold">{job.title || "Untitled Job"}</div>
                 <div className="flex-1">
-                  <div>{job.description}</div>
-                  <div className="text-sm text-gray-600">{job.company}</div>
+                  <div>{job.description || "No description provided"}</div>
+                  <div className="text-sm text-gray-600">{job.company || "Confidential"}</div>
                 </div>
                 <div className="flex items-center gap-2">
                   <button
@@ -131,19 +198,7 @@ const [appliedJobsSet, setAppliedJobsSet] = useState(new Set());
                   <button
                     className="px-3 py-1 rounded bg-green-600 text-white disabled:opacity-60"
                     disabled={applyingJobId === job._id || appliedJobsSet.has(job._id)}
-                    onClick={async () => {
-                      try {
-                        setApplyingJobId(job._id);
-                        await applyToJob(job._id);
-                        setAppliedJobsSet((prev) => new Set([...Array.from(prev), job._id]));
-                        localStorage.setItem(
-                          "appliedJobs",
-                          JSON.stringify(Array.from(new Set([...appliedJobsSet, job._id])))
-                        );
-                      } finally {
-                        setApplyingJobId("");
-                      }
-                    }}
+                    onClick={() => handleApplyJob(job._id)}
                   >
                     {appliedJobsSet.has(job._id)
                       ? "Applied"
@@ -170,16 +225,17 @@ const [appliedJobsSet, setAppliedJobsSet] = useState(new Set());
               >
                 <div className="flex items-center gap-3">
                   <img
-                    src={user.profilePic || defaultAvatar}
-                    alt={user.name}
+                    src={user.profilePic?.url || defaultAvatar}
+                    alt={user.name || "User"}
                     className="w-10 h-10 rounded-full object-cover"
                   />
                   <div>
-                    <div className="font-bold">{user.name}</div>
-                    <div className="text-sm text-gray-600">{user.email}</div>
-                    <div className="text-xs text-gray-400">{user.role}</div>
+                    <div className="font-bold">{user.name || "Unknown User"}</div>
+                    <div className="text-sm text-gray-600">{user.email || "No Email"}</div>
+                    <div className="text-xs text-gray-400">{user.role || "No Role"}</div>
                   </div>
                 </div>
+
                 <div className="flex items-center gap-2">
                   <button
                     className="px-3 py-1 rounded bg-blue-600 text-white"
@@ -187,29 +243,30 @@ const [appliedJobsSet, setAppliedJobsSet] = useState(new Set());
                   >
                     View Profile
                   </button>
+
                   <button
                     className="px-3 py-1 rounded bg-green-600 text-white disabled:opacity-60"
                     disabled={
-                      connectingUserId === user._id || sentRequests.has(user._id)
+                      connectingUserId === user._id ||
+                      sentRequests.has(user._id) ||
+                      connectedUsers.has(user._id)
                     }
-                    onClick={async () => {
-                      try {
-                        setConnectingUserId(user._id);
-                        await sendConnectionRequest(user._id);
-                        setSentRequests(
-                          (prev) => new Set([...Array.from(prev), user._id])
-                        );
-                        setConnectingUserId("");
-                      } catch {
-                        setConnectingUserId("");
-                      }
-                    }}
+                    onClick={() => handleConnectUser(user._id)}
                   >
-                    {sentRequests.has(user._id)
+                    {connectedUsers.has(user._id)
+                      ? "Connected"
+                      : sentRequests.has(user._id)
                       ? "Request Sent"
                       : connectingUserId === user._id
                       ? "Connecting..."
                       : "Connect"}
+                  </button>
+
+                  <button
+                    className="px-3 py-1 rounded bg-purple-600 text-white hover:bg-purple-700"
+                    onClick={() => navigate(`/messages/${user._id}`)}
+                  >
+                    Chat
                   </button>
                 </div>
               </li>
@@ -227,17 +284,17 @@ const [appliedJobsSet, setAppliedJobsSet] = useState(new Set());
 
       {/* User Modal */}
       {selectedUser && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white rounded-lg p-6 w-96">
             <h2 className="text-xl font-bold mb-4">User Details</h2>
             <img
-              src={selectedUser.profilePic || defaultAvatar}
-              alt={selectedUser.name}
+              src={selectedUser.profilePic?.url || defaultAvatar}
+              alt={selectedUser.name || "User"}
               className="w-20 h-20 rounded-full object-cover mx-auto"
             />
-            <p className="mt-2"><strong>Name:</strong> {selectedUser.name}</p>
-            <p><strong>Email:</strong> {selectedUser.email}</p>
-            <p><strong>Role:</strong> {selectedUser.role}</p>
+            <p className="mt-2"><strong>Name:</strong> {selectedUser.name || "Unknown"}</p>
+            <p><strong>Email:</strong> {selectedUser.email || "N/A"}</p>
+            <p><strong>Role:</strong> {selectedUser.role || "N/A"}</p>
             <button
               className="mt-4 px-4 py-2 bg-red-600 text-white rounded"
               onClick={() => setSelectedUser(null)}
@@ -250,15 +307,15 @@ const [appliedJobsSet, setAppliedJobsSet] = useState(new Set());
 
       {/* Job Modal */}
       {selectedJob && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white rounded-lg p-6 w-96">
             <h2 className="text-xl font-bold mb-4">Job Details</h2>
-            <p><strong>Title:</strong> {selectedJob.title}</p>
-            <p><strong>Company:</strong> {selectedJob.company}</p>
-            <p><strong>Description:</strong> {selectedJob.description}</p>
+            <p><strong>Title:</strong> {selectedJob.title || "Untitled Job"}</p>
+            <p><strong>Company:</strong> {selectedJob.company || "Unknown"}</p>
+            <p><strong>Description:</strong> {selectedJob.description || "No description"}</p>
             <p><strong>Location:</strong> {selectedJob.location || "N/A"}</p>
             <p className="text-xs text-gray-500 mt-2">
-              Posted: {new Date(selectedJob.createdAt).toLocaleString()}
+              Posted: {selectedJob.createdAt ? new Date(selectedJob.createdAt).toLocaleString() : "N/A"}
             </p>
             <button
               className="mt-4 px-4 py-2 bg-red-600 text-white rounded"

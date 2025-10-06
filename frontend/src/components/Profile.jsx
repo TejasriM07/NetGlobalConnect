@@ -6,7 +6,7 @@ import {
   getConnections,
   respondToConnectionRequest
 } from "../api";
-import { User, Briefcase, Star, Users, Mail, Edit3, X } from "lucide-react";
+import { User, Briefcase, Star, Users, Mail, Edit3, X, FileText } from "lucide-react";
 import defaultAvatar from "../assets/default.jpeg";
 
 export default function Profile() {
@@ -35,9 +35,6 @@ export default function Profile() {
         getConnectionRequests(),
         getConnections()
       ]);
-
-      
-
       setConnectionRequests(reqRes.data.requests || []);
       setConnections(connRes.data.connections || connRes.data.data || []);
     } catch (err) {
@@ -114,7 +111,7 @@ export default function Profile() {
           <div className="flex flex-col items-center text-center">
             <div className="w-32 h-32 rounded-full border-4 border-cyan-400 shadow-lg overflow-hidden">
               <img
-              src={profile.profilePic?.url || "/default-avatar.svg"}
+                src={profile.profilePic?.url || defaultAvatar}
                 alt="Profile"
                 className="w-full h-full object-cover"
               />
@@ -150,6 +147,14 @@ export default function Profile() {
             className="mt-6 w-full py-3 rounded-xl bg-gradient-to-r from-cyan-500 to-purple-500 text-black font-semibold flex items-center justify-center gap-2 hover:brightness-110"
           >
             <Edit3 size={18} /> Edit Profile
+          </button>
+
+          {/* My Posts Button */}
+          <button
+            onClick={() => navigate("/my-posts")}
+            className="mt-4 w-full py-3 rounded-xl bg-purple-600 text-white font-semibold flex items-center justify-center gap-2 hover:bg-purple-500"
+          >
+            <FileText size={18} /> My Posts
           </button>
         </div>
 
@@ -284,13 +289,13 @@ export default function Profile() {
             )}
           </div>
 
-        { }
+          {/* Quick Actions */}
           <div className="bg-[#11121f]/80 rounded-3xl p-6 border border-[#7c3aed]/30 shadow-inner">
             <h3 className="text-cyan-400 font-bold mb-3 flex items-center gap-2">
               Quick Actions
             </h3>
-            <div className="flex gap-2">
-            {isAdmin ? (
+            <div className="flex gap-2 flex-wrap">
+              {isAdmin ? (
                 <button
                   type="button"
                   onClick={() => navigate("/reported-posts")}

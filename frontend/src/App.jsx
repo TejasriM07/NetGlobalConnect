@@ -18,6 +18,8 @@ import ApplicantsList from "./jobs/ApplicantsList";
 import SearchResults from "./pages/SearchResult";
 import ReportedPosts from "./pages/ReportedPosts";
 import MyReportedPosts from "./pages/MyReportedPosts";
+import CreateJob from "./jobs/CreateJob"; 
+import MyPosts from "./pages/MyPosts";
 
 export default function App() {
   return (
@@ -25,107 +27,130 @@ export default function App() {
       <div className="min-h-screen flex flex-col bg-neutral-950">
         <Navbar />
         <main className="flex-1">
-      <Routes>
-        <Route path="/signup" element={<Signup />} />
-        <Route path="/login" element={<Login />} />
+          <Routes>
+            {/* Public Routes */}
+            <Route path="/" element={<Landing />} />
+            <Route path="/signup" element={<Signup />} />
+            <Route path="/login" element={<Login />} />
 
-        {/* Protected routes */}
-        <Route
-          path="/profile"
-          element={
-            <PrivateRoute>
-              <Profile />
-            </PrivateRoute>
-          }
-        />
-        <Route path="/search-results" element={<PrivateRoute><SearchResults /></PrivateRoute>} />
-        <Route
-    path="/search-results"
-    element={
-      <PrivateRoute>
-        <SearchResults />
-      </PrivateRoute>
-    }
-  />
-        <Route
-          path="/edit-profile"
-          element={
-            <PrivateRoute>
-              <ProfileForm />
-            </PrivateRoute>
-          }
-        />
-        <Route
-          path="/users/:id"
-          element={
-            <PrivateRoute>
-              <UserProfile />
-            </PrivateRoute>
-          }
-        />
+            {/* Protected Routes */}
+            <Route
+              path="/profile"
+              element={
+                <PrivateRoute>
+                  <Profile />
+                </PrivateRoute>
+              }
+            />
 
-        {/* ✅ Inbox route */}
-        <Route
-          path="/messages"
-          element={
-            <PrivateRoute>
-              <MessagesList />
-            </PrivateRoute>
-          }
-        />
+            <Route
+              path="/edit-profile"
+              element={
+                <PrivateRoute>
+                  <ProfileForm />
+                </PrivateRoute>
+              }
+            />
 
-        {/* ✅ Chat route */}
-        <Route
-          path="/messages/:id"
-          element={
-            <PrivateRoute>
-              <ChatPage />
-            </PrivateRoute>
-          }
-        />
+            <Route
+              path="/users/:id"
+              element={
+                <PrivateRoute>
+                  <UserProfile />
+                </PrivateRoute>
+              }
+            />
 
-        <Route path="/" element={<Landing />} />
-        <Route
-          path="/feed"
-          element={
-            <PrivateRoute>
-              <Feed />
-            </PrivateRoute>
-          }
-        />
-        <Route
-          path="/reported-posts"
-          element={
-            <PrivateRoute>
-              <ReportedPosts />
-            </PrivateRoute>
-          }
-        />
-        <Route
-          path="/my-reported-posts"
-          element={
-            <PrivateRoute>
-              <MyReportedPosts />
-            </PrivateRoute>
-          }
-        />
+            <Route
+              path="/feed"
+              element={
+                <PrivateRoute>
+                  <Feed />
+                </PrivateRoute>
+              }
+            />
 
-        <Route
-          path="/jobs"
-          element={
-            <PrivateRoute>
-              <JobList />
-            </PrivateRoute>
-          }
-        />
+            <Route
+              path="/reported-posts"
+              element={
+                <PrivateRoute>
+                  <ReportedPosts />
+                </PrivateRoute>
+              }
+            />
 
+            <Route
+              path="/my-reported-posts"
+              element={
+                <PrivateRoute>
+                  <MyReportedPosts />
+                </PrivateRoute>
+              }
+            />
 
-        <Route path="/jobs/:jobId/applicants" element={
-          <PrivateRoute>
-            <ApplicantsList />
-          </PrivateRoute>
-        } />
-      </Routes>
+            <Route
+              path="/messages"
+              element={
+                <PrivateRoute>
+                  <MessagesList />
+                </PrivateRoute>
+              }
+            />
+
+            <Route
+              path="/messages/:id"
+              element={
+                <PrivateRoute>
+                  <ChatPage />
+                </PrivateRoute>
+              }
+            />
+
+            <Route
+              path="/jobs"
+              element={
+                <PrivateRoute>
+                  <JobList />
+                </PrivateRoute>
+              }
+            />
+
+            <Route
+              path="/jobs/:jobId/applicants"
+              element={
+                <PrivateRoute>
+                  <ApplicantsList />
+                </PrivateRoute>
+              }
+            />
+
+            <Route
+              path="/search-results"
+              element={
+                <PrivateRoute>
+                  <SearchResults />
+                </PrivateRoute>
+              }
+            />
+
+            <Route
+              path="/create-job"
+              element={
+                <PrivateRoute>
+                  <CreateJob />
+                </PrivateRoute>
+              }
+            />
+
+            <Route
+              path="/my-posts"
+              element={
+                <PrivateRoute>
+                  <MyPosts />
+                </PrivateRoute>
+              }
+            />
+          </Routes>
         </main>
         <Footer />
       </div>

@@ -248,7 +248,7 @@ const handleReport = async (postId) => {
               {/* Author */}
               <div className="flex items-center mb-3">
                 <img
-                  src={post.userId?.profilePic?.url || "/default-avatar.svg"}
+                  src={post.userId.profilePic?.trim() ? post.userId.profilePic : defaultAvatar}
                  
                   alt="User"
                   className="w-11 h-11 rounded-full mr-3 border border-gray-700 object-cover"

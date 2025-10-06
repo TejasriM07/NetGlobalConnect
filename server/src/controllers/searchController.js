@@ -2,7 +2,6 @@ const User = require("../models/User");
 const Post = require("../models/Post");
 const Job = require("../models/Job");
 
-// Unified search with filters
 const unifiedSearch = async (req, res) => {
   try {
     const { q, type, sortBy, role } = req.query;
@@ -17,14 +16,13 @@ const unifiedSearch = async (req, res) => {
     // ===== Users =====
     if (!type || type === "users") {
       const userFilter = {
-        name: searchRegex,
+        $or: [{ name: searchRegex }, { skills: searchRegex }],
         _id: { $ne: req.user._id },
       };
 
-      if (role) userFilter.role = role; // filter by role if provided
-
+      if (role) userFilter.role = role;
       let userQuery = User.find(userFilter).select(
-        "name email profilePic role"
+        "name email profilePic role skills createdAt"
       );
 
       if (sortBy === "date") {
@@ -37,9 +35,7 @@ const unifiedSearch = async (req, res) => {
     // ===== Posts =====
     if (!type || type === "posts") {
       let postQuery = Post.find({
-        $or: [
-          { content: searchRegex },
-        ],
+        $or: [{ content: searchRegex }],
       })
         .populate("userId", "name email")
         .populate("comments.userId", "name email");
@@ -58,8 +54,9 @@ const unifiedSearch = async (req, res) => {
           { title: searchRegex },
           { description: searchRegex },
           { company: searchRegex },
+          { skills: searchRegex },
         ],
-      }).select("title description company location createdAt");
+      }).select("title description company location skills createdAt");
 
       if (sortBy === "date") {
         jobQuery = jobQuery.sort({ createdAt: -1 });

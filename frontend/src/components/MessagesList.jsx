@@ -1,12 +1,11 @@
-// src/components/MessagesList.jsx
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import axios from "axios";
+import defaultAvatar from "../assets/default.jpeg"
 
 export default function MessagesList() {
   const [conversations, setConversations] = useState([]);
 
-  
   const BACKEND_URL =
     import.meta.env.VITE_BACKEND_URL || "https://netglobalconnect.onrender.com";
 
@@ -22,6 +21,7 @@ export default function MessagesList() {
           setConversations(res.data.data || []);
         }
       } catch (err) {
+        console.error(err);
       }
     };
 
@@ -42,15 +42,22 @@ export default function MessagesList() {
               key={conv.user._id}
               className="p-3 bg-gray-800 rounded hover:bg-gray-700 transition"
             >
-              <Link to={`/messages/${conv.user._id}`}>
-                <div className="font-semibold">{conv.user.name}</div>
-                <div className="text-sm text-gray-400 truncate">
-                  {conv.lastMessage?.content || "No messages"}
-                </div>
-                <div className="text-xs text-gray-500">
-                  {conv.lastMessage
-                    ? new Date(conv.lastMessage.timestamp).toLocaleString()
-                    : ""}
+              <Link to={`/messages/${conv.user._id}`} className="flex items-center gap-3">
+                <img
+                  src={conv.user.profilePic?.url || defaultAvatar}
+                  alt={conv.user.name || "User"}
+                  className="w-10 h-10 rounded-full object-cover"
+                />
+                <div className="flex-1">
+                  <div className="font-semibold">{conv.user.name || "Unknown User"}</div>
+                  <div className="text-sm text-gray-400 truncate">
+                    {conv.lastMessage?.content || "No messages"}
+                  </div>
+                  <div className="text-xs text-gray-500">
+                    {conv.lastMessage
+                      ? new Date(conv.lastMessage.timestamp).toLocaleString()
+                      : ""}
+                  </div>
                 </div>
               </Link>
             </li>
@@ -59,4 +66,4 @@ export default function MessagesList() {
       )}
     </div>
   );
-};
+}

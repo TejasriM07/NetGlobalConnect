@@ -4,6 +4,7 @@ import { useParams } from "react-router-dom";
 import axios from "axios";
 import { io } from "socket.io-client";
 import { getProfile, getUserById } from "../api";
+import defaultAvatar from "../assets/default.jpeg";
 
 export default function ChatPage() {
     const { id: otherUserId } = useParams();
@@ -11,7 +12,7 @@ export default function ChatPage() {
     const [newMessage, setNewMessage] = useState("");
     const [myId, setMyId] = useState(null);
     const [myName, setMyName] = useState("");
-    const [otherUserName, setOtherUserName] = useState("");
+    const [otherUser, setOtherUser] = useState({ name: "Unknown User", profilePic: null });
     const messagesEndRef = useRef(null);
     const socketRef = useRef(null);
 
@@ -32,7 +33,10 @@ export default function ChatPage() {
                 setMyName(meRes.data?.data?.name || "You");
 
                 const otherRes = await getUserById(otherUserId);
-                setOtherUserName(otherRes.data?.data?.name || "Unknown User");
+                setOtherUser({
+                    name: otherRes.data?.data?.name || "Unknown User",
+                    profilePic: otherRes.data?.data?.profilePic || null,
+                });
             } catch (err) {
                 console.error("Failed to fetch users:", err);
             }
@@ -91,7 +95,6 @@ export default function ChatPage() {
         const content = newMessage;
         setNewMessage("");
 
-        // Optimistic local message
         const tempMessage = {
             _id: "temp-" + Date.now(),
             senderId: myId,
@@ -109,12 +112,10 @@ export default function ChatPage() {
             );
 
             if (res.data?.success) {
-                // Replace temp message with actual message from backend
                 setMessages((prev) =>
                     prev.map((m) => (m._id === tempMessage._id ? res.data.data : m))
                 );
 
-                // Emit to receiver's room
                 socketRef.current.emit("private_message", {
                     ...res.data.data,
                     to: otherUserId,
@@ -126,10 +127,16 @@ export default function ChatPage() {
     };
 
     return (
-        <div className="flex flex-col h-screen bg-black text-white p-4">
-            <h2 className="text-xl font-bold mb-4 border-b border-gray-700 pb-2">
-                Chat with {otherUserName}
-            </h2>
+        <div className="flex flex-col h-[calc(100vh-50px)] bg-black text-white p-4">
+            {/* Header with profile pic */}
+            <div className="flex items-center mb-4 border-b border-gray-700 pb-2 gap-3">
+                <img
+                    src={otherUser.profilePic?.url || defaultAvatar}
+                    alt={otherUser.name}
+                    className="w-10 h-10 rounded-full object-cover"
+                />
+                <h2 className="text-xl font-bold">Chatting with {otherUser.name}</h2>
+            </div>
 
             {/* Messages */}
             <div className="flex-1 overflow-y-auto mb-4 px-2 py-2 rounded bg-gray-900 flex flex-col">
@@ -147,7 +154,7 @@ export default function ChatPage() {
                                     }`}
                             >
                                 <p className="font-semibold text-sm mb-1">
-                                    {isMe ? myName : otherUserName}
+                                    {isMe ? myName : otherUser.name}
                                 </p>
                                 {msg.content}
                                 <div className="text-xs text-gray-300 mt-1">

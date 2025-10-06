@@ -53,15 +53,15 @@ export default function ApplicantsList() {
                     {applicants.map((a) => (
                         <div
                             key={a._id}
-                            onClick={() => navigate(`/users/${a._id}`)} // 👈 Navigate to applicant profile
+                            onClick={() => navigate(`/users/${a._id}`)} 
                             className="bg-black/60 backdrop-blur-md border border-purple-600 rounded-2xl p-6 shadow-lg hover:shadow-xl transition transform hover:-translate-y-1 cursor-pointer"
                         >
                             <div className="flex flex-col gap-2">
-                                <h3 className="text-xl font-semibold text-white">{a.name}</h3>
+                                <h3 className="text-xl font-semibold text-white">Name : {a.name}</h3>
                                 <p className="text-purple-300 font-medium">
-                                    {a.role || "Applicant"}
+                                    Role : {a.role || "Applicant"}
                                 </p>
-                                <p className="text-gray-400 text-sm">{a.email}</p>
+                                <p className="text-gray-400 text-sm">Email : {a.email}</p>
                                 {a.phone && (
                                     <p className="text-gray-400 text-sm">Phone: {a.phone}</p>
                                 )}

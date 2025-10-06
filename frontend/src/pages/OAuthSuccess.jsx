@@ -1,3 +1,4 @@
+// src/pages/OAuthSuccess.jsx
 import React, { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { getProfile, setAuthToken } from "../api";
@@ -11,7 +12,7 @@ export default function OAuthSuccess() {
     const params = new URLSearchParams(location.search);
     const token = params.get("token");
 
-    async function finalizeLogin() {
+    const finalizeLogin = async () => {
       if (!token) {
         setMessage("Missing token. Redirecting to login…");
         setTimeout(() => navigate("/login"), 1200);
@@ -19,30 +20,28 @@ export default function OAuthSuccess() {
       }
 
       try {
-       
+        // Store token (set header + localStorage via setAuthToken)
         setAuthToken(token);
 
-        
-        try {
-          const me = await getProfile();
-          const meData = me.data?.data || me.data;
-          if (meData) {
-            localStorage.setItem("userRole", meData.role || "");
-            localStorage.setItem("userId", meData._id || meData.id || "");
-          }
-        } catch (e) {
-          
+        // Fetch user profile
+        const res = await getProfile();
+        const meData = res.data?.data || res.data;
+        if (meData) {
+          localStorage.setItem("userRole", meData.role || "");
+          localStorage.setItem("userId", meData._id || meData.id || "");
         }
 
-        // let the app know auth state changed
+        // Notify the app that authentication state changed so Navbar (and others) update immediately
         try { window.dispatchEvent(new Event("authchange")); } catch {}
 
-        navigate("/profile", { replace: true });
+        // Navigate to feed
+        navigate("/feed", { replace: true });
       } catch (err) {
+        console.error("OAuth finalize error:", err);
         setMessage("Sign-in failed. Redirecting to login…");
         setTimeout(() => navigate("/login"), 1200);
       }
-    }
+    };
 
     finalizeLogin();
   }, [location.search, navigate]);
@@ -55,5 +54,3 @@ export default function OAuthSuccess() {
     </div>
   );
 }
-
-

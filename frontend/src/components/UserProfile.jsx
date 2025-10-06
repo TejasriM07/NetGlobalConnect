@@ -1,7 +1,7 @@
-// src/components/UserProfile.jsx
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { getUserById, getProfile, sendConnectionRequest } from "../api";
+import defaultAvatar from "../assets/default.jpeg";
 
 export default function UserProfile() {
   const { id } = useParams();
@@ -62,7 +62,10 @@ export default function UserProfile() {
         <div className="md:col-span-1 flex flex-col items-center bg-[#11121f]/80 rounded-3xl p-6 shadow-lg border border-[#06b6d4]/40">
           <div className="w-40 h-40 rounded-full border-4 border-cyan-400 shadow-lg overflow-hidden">
             <img
-              src={profile.profilePic?.url || "/default-avatar.png"}
+              src={ typeof profile.profilePic === "string"
+              ? profile.profilePic.trim()
+              : profile.profilePic?.url || defaultAvatar
+              }
               alt="Profile"
               className="w-full h-full object-cover"
             />

@@ -54,7 +54,7 @@ export default function Signup() {
 
       try { window.dispatchEvent(new Event("authchange")); } catch {}
       // redirect to profile
-      navigate("/profile");
+      navigate("/feed", { replace: true });
     } catch (err) {
       setError(err.response?.data?.message || "Something went wrong");
     } finally {
