@@ -111,7 +111,7 @@ const oauthLogin = async (req, res) => {
     });
 
     // 🔹 Redirect to frontend root page with token for auto-login
-    const frontend = process.env.FRONTEND_URL || "https://playful-raindrop-fed49f.netlify.app";
+    const frontend = process.env.FRONTEND_URL || "https://68e3c7ec8eb297e7aa5fdae2--amazing-gumption-6b73bc.netlify.app";
     const redirectUrl = `${frontend}/?token=${token}`;
     console.log('Redirecting to:', redirectUrl);
     
