@@ -67,6 +67,7 @@ export default function Navbar() {
     e.preventDefault();
     if (!searchQuery.trim()) return;
     navigate("/search-results", { state: { query: searchQuery } });
+    setSearchQuery("");
     setMenuOpen(false);
   };
 
