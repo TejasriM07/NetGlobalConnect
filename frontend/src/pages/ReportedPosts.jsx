@@ -49,7 +49,7 @@ export default function ReportedPosts() {
                 <span className="ml-2 text-gray-500">{new Date(post.createdAt).toLocaleString()}</span>
               </div>
               <p className="text-gray-100 mb-2">{post.content}</p>
-              {post.image?.url && <img src={post.image.url} alt="Post" className="rounded-lg border border-gray-800 mb-2" />}
+              {post.image?.url && (<img src={post.image.url} alt="Post" className="rounded-lg border border-gray-800 mb-2 w-full h-auto object-cover"/>)}
               <div className="text-xs text-gray-400 mb-2">Reports: {post.reportedBy?.length || 0}</div>
               <button onClick={() => handleDelete(post._id)} className="px-3 py-1 rounded bg-rose-600 hover:bg-rose-700 text-white">
                 Delete Post

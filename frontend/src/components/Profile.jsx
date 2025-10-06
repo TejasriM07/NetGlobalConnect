@@ -156,6 +156,19 @@ export default function Profile() {
           >
             <FileText size={18} /> My Posts
           </button>
+
+          <button
+            onClick={() => {
+            if (profile.role === "JobSeeker") {
+              navigate("/applied-jobs");
+            } else if (profile.role === "Employee") {
+              navigate("/posted-jobs");
+            }
+            }}
+          className="mt-4 w-full py-3 rounded-xl bg-purple-500 text-white font-semibold flex items-center justify-center gap-2 hover:bg-purple-600"
+          >
+          {profile.role === "JobSeeker" ? "Applied Jobs" : "My Posted Jobs"}
+          </button>
         </div>
 
         {/* Right column: Details */}

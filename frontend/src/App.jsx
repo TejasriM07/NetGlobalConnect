@@ -1,4 +1,3 @@
-// src/App.jsx
 import React from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Navbar from "./menu/Navbar";
@@ -20,6 +19,8 @@ import ReportedPosts from "./pages/ReportedPosts";
 import MyReportedPosts from "./pages/MyReportedPosts";
 import CreateJob from "./jobs/CreateJob"; 
 import MyPosts from "./pages/MyPosts";
+import AppliedJobs from "./pages/AppliedJobs";
+import PostedJobs from "./pages/PostedJobs";
 
 export default function App() {
   return (
@@ -59,6 +60,24 @@ export default function App() {
                   <UserProfile />
                 </PrivateRoute>
               }
+            />
+
+            <Route 
+              path="/applied-jobs" 
+              element={
+                <PrivateRoute>
+                  <AppliedJobs />
+                </PrivateRoute>
+              } 
+            />
+
+            <Route 
+              path="/posted-jobs" 
+              element={
+                <PrivateRoute>
+                  <PostedJobs />
+                </PrivateRoute>
+              } 
             />
 
             <Route
