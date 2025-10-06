@@ -1,9 +1,5 @@
 const User = require("../models/User");
-const {
-  uploadStream,
-  uploadPublicPDF,
-  getPublicResumeUrl,
-} = require("../utils/cloudinary");
+const { uploadStream } = require("../utils/cloudinary");
 
 // Get logged-in user profile
 const getProfile = async (req, res) => {
@@ -14,60 +10,15 @@ const getProfile = async (req, res) => {
   }
 };
 
-// Get public resume URL for a user
-const getResume = async (req, res) => {
-  try {
-    const { id } = req.params;
-    const user = await User.findById(id);
-
-    if (!user || !user.resume?.publicId) {
-      return res
-        .status(404)
-        .json({ success: false, message: "Resume not found" });
-    }
-
-    // Public URL
-    const publicUrl = getPublicResumeUrl(user.resume.publicId);
-
-    return res.json({ success: true, url: publicUrl });
-  } catch (err) {
-    console.error(err);
-    return res
-      .status(500)
-      .json({ success: false, message: "Failed to get resume URL" });
-  }
-};
-
-// Update profile (optional profile image and resume)
+// Update profile (optional profile image)
 const updateProfile = async (req, res) => {
   try {
     const updates = req.body; // name, bio, skills, etc.
 
     // Handle profile image
-    if (req.files?.profilePic?.[0]) {
-      const uploadRes = await uploadStream(req.files.profilePic[0].buffer);
+    if (req.file && req.file.buffer) {
+      const uploadRes = await uploadStream(req.file.buffer);
       updates.profilePic = {
-        url: uploadRes.secure_url,
-        publicId: uploadRes.public_id,
-      };
-    }
-
-    // Handle resume (PDF only)
-    if (req.files?.resume?.[0]) {
-      const file = req.files.resume[0];
-      if (file.mimetype !== "application/pdf") {
-        return res.status(400).json({
-          success: false,
-          message: "Only PDF files are allowed for resume",
-        });
-      }
-
-      // Upload as public PDF
-      const uploadRes = await uploadPublicPDF(
-        file.buffer,
-        "global_connect_resumes"
-      );
-      updates.resume = {
         url: uploadRes.secure_url,
         publicId: uploadRes.public_id,
       };
@@ -98,4 +49,4 @@ const getUserById = async (req, res) => {
   }
 };
 
-module.exports = { getProfile, updateProfile, getUserById, getResume };
+module.exports = { getProfile, updateProfile, getUserById };

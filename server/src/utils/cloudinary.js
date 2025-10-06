@@ -7,15 +7,10 @@ cloudinary.config({
   api_secret: process.env.CLOUDINARY_API_SECRET,
 });
 
-// Upload as public (raw for PDFs)
-const uploadPublicPDF = (buffer, folder = "global_connect_resumes") => {
+const uploadStream = (buffer, folder = "global_connect_profiles") => {
   return new Promise((resolve, reject) => {
     const stream = cloudinary.uploader.upload_stream(
-      {
-        folder,
-        resource_type: "raw", // PDFs, docs
-        type: "upload", // makes it public
-      },
+      { folder },
       (error, result) => {
         if (error) return reject(error);
         resolve(result);
@@ -25,23 +20,13 @@ const uploadPublicPDF = (buffer, folder = "global_connect_resumes") => {
   });
 };
 
-// Delete by publicId
 const deleteByPublicId = async (publicId) => {
   if (!publicId) return;
   try {
-    await cloudinary.uploader.destroy(publicId, { resource_type: "raw" });
+    await cloudinary.uploader.destroy(publicId);
   } catch (err) {
     console.warn("Cloudinary delete error", err);
   }
 };
 
-// Public URL for PDF
-const getPublicResumeUrl = (publicId) => {
-  if (!publicId) return null;
-  return cloudinary.url(publicId, {
-    resource_type: "raw",
-    type: "upload", // public access
-  });
-};
-
-module.exports = { uploadPublicPDF, deleteByPublicId, getPublicResumeUrl };
+module.exports = { uploadStream, deleteByPublicId };
