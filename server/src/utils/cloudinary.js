@@ -34,16 +34,15 @@ const deleteByPublicId = async (publicId) => {
   }
 };
 
-// Generate signed URL for private resume (raw resource)
 const getSignedResumeUrl = (publicId, expiresInSec = 60) => {
   if (!publicId) return null;
 
-  return cloudinary.url(publicId, {
-    resource_type: "raw", 
-    type: "authenticated",
-    sign_url: true,
+  return cloudinary.utils.private_download_url(publicId, {
+    resource_type: "raw",   
     expires_at: Math.floor(Date.now() / 1000) + expiresInSec,
+    attachment: false       
   });
 };
+
 
 module.exports = { uploadStream, deleteByPublicId, getSignedResumeUrl };

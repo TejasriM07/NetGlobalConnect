@@ -22,8 +22,7 @@ const getResume = async (req, res) => {
         .json({ success: false, message: "Resume not found" });
     }
 
-    // Generate signed URL (valid for 5 minutes)
-    const signedUrl = getSignedResumeUrl(user.resume.publicId, 300);
+    const signedUrl = getSignedResumeUrl(user.resume.publicId, 300, { attachment: false });
 
     return res.json({ success: true, url: signedUrl });
   } catch (err) {
@@ -33,6 +32,7 @@ const getResume = async (req, res) => {
       .json({ success: false, message: "Failed to generate resume URL" });
   }
 };
+
 
 // Update profile (optional profile image)
 const updateProfile = async (req, res) => {
