@@ -140,6 +140,45 @@ const searchUsersByName = async (req, res) => {
   }
 };
 
+// Disconnect from a user
+const disconnectUser = async (req, res) => {
+  try {
+    const targetUserId = req.params.id;
+    const currentUserId = req.user._id;
+
+    // Find both users
+    const [currentUser, targetUser] = await Promise.all([
+      User.findById(currentUserId),
+      User.findById(targetUserId)
+    ]);
+
+    if (!targetUser) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    // Check if they are actually connected
+    if (!currentUser.connections.includes(targetUserId)) {
+      return res.status(400).json({ message: "Not connected to this user" });
+    }
+
+    // Remove connection from both users
+    currentUser.connections = currentUser.connections.filter(
+      id => id.toString() !== targetUserId
+    );
+    targetUser.connections = targetUser.connections.filter(
+      id => id.toString() !== currentUserId.toString()
+    );
+
+    // Save both users
+    await Promise.all([currentUser.save(), targetUser.save()]);
+
+    res.status(200).json({ message: "Successfully disconnected" });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Server Error" });
+  }
+};
+
 module.exports = {
   sendConnectionRequest,
   acceptConnectionRequest,
@@ -147,4 +186,5 @@ module.exports = {
   listConnections,
   listConnectionRequests,
   searchUsersByName,
+  disconnectUser,
 };

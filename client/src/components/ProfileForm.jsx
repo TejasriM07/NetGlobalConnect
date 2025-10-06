@@ -123,91 +123,95 @@ export default function EditProfile() {
   if (loading) return <p className="text-slate-400 p-6">Loading profile...</p>;
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-[#0a0a0f] to-[#12121b] p-8 text-white">
-      <h2 className="text-3xl font-bold text-center mb-6">Edit Profile</h2>
+    <div className="min-h-screen bg-slate-50 p-8">
+      <div className="max-w-4xl mx-auto">
+        <h2 className="text-3xl font-bold text-center mb-8 text-slate-900">Edit Profile</h2>
 
-      <form onSubmit={handleSubmit} className="space-y-6 max-w-3xl mx-auto">
-        {/* Profile Picture URL */}
-        <div>
-          <label className="block text-cyan-400 font-bold mb-1">Profile Picture URL</label>
-          <input
-            type="text"
-            name="profilePic"
-            value={form.profilePic}
-            onChange={handleChange}
-            placeholder="https://res.cloudinary.com/.../image.png"
-            className={`w-full px-4 py-2 rounded-xl bg-[#11121f] border ${validPic ? "border-cyan-500" : "border-red-500"
-              } focus:ring-2 focus:ring-cyan-400 text-white`}
-          />
-          {form.profilePic && (
-            <img
-              src={form.profilePic}
-              alt="Profile"
-              className="w-32 h-32 rounded-full mt-2 object-cover border border-cyan-500"
-            />
-          )}
-          {!validPic && (
-            <p className="text-red-400 text-sm mt-1">Please enter a valid image URL.</p>
-          )}
-        </div>
+        <div className="bg-white rounded-xl shadow-lg p-8">
+          <form onSubmit={handleSubmit} className="space-y-6">
+            {/* Profile Picture URL */}
+            <div>
+              <label className="block text-slate-700 font-semibold mb-2">Profile Picture URL</label>
+              <input
+                type="text"
+                name="profilePic"
+                value={form.profilePic}
+                onChange={handleChange}
+                placeholder="https://res.cloudinary.com/.../image.png"
+                className={`w-full px-4 py-3 rounded-lg bg-slate-50 border ${validPic ? "border-slate-300" : "border-red-300"
+                  } focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-slate-900 placeholder-slate-500`}
+              />
+              {form.profilePic && (
+                <img
+                  src={form.profilePic}
+                  alt="Profile"
+                  className="w-32 h-32 rounded-full mt-4 object-cover border-4 border-blue-200 shadow-lg"
+                />
+              )}
+              {!validPic && (
+                <p className="text-red-600 text-sm mt-2">Please enter a valid image URL.</p>
+              )}
+            </div>
 
-        {/* Name */}
-        <div>
-          <label className="block text-cyan-400 font-bold mb-1">Name</label>
-          <input
-            type="text"
-            name="name"
-            value={form.name}
-            onChange={handleChange}
-            className="w-full px-4 py-2 rounded-xl bg-[#11121f] border border-cyan-500 focus:ring-2 focus:ring-cyan-400 text-white"
-            required
-          />
-        </div>
+            {/* Name */}
+            <div>
+              <label className="block text-slate-700 font-semibold mb-2">Name</label>
+              <input
+                type="text"
+                name="name"
+                value={form.name}
+                onChange={handleChange}
+                className="w-full px-4 py-3 rounded-lg bg-slate-50 border border-slate-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-slate-900"
+                required
+              />
+            </div>
 
-        {/* Bio */}
-        <div>
-          <label className="block text-cyan-400 font-bold mb-1">Bio</label>
-          <textarea
-            name="bio"
-            value={form.bio}
-            onChange={handleChange}
-            className="w-full px-4 py-2 rounded-xl bg-[#11121f] border border-cyan-500 focus:ring-2 focus:ring-cyan-400 text-white"
-          />
-        </div>
+            {/* Bio */}
+            <div>
+              <label className="block text-slate-700 font-semibold mb-2">Bio</label>
+              <textarea
+                name="bio"
+                value={form.bio}
+                onChange={handleChange}
+                rows="4"
+                className="w-full px-4 py-3 rounded-lg bg-slate-50 border border-slate-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-slate-900 resize-vertical"
+                placeholder="Tell us about yourself..."
+              />
+            </div>
 
-        {/* Skills */}
-        <div className="bg-[#1a1a25]/80 rounded-3xl p-4">
-          <h3 className="text-cyan-400 font-bold mb-2">Skills</h3>
-          <div className="flex flex-wrap gap-2 mb-3">
-            {(form.skills || []).length > 0 ? (
-              form.skills.map((skill, idx) => (
-                <div
-                  key={idx}
-                  className="bg-cyan-500/20 px-3 py-1 rounded-full flex items-center gap-2 text-sm"
-                >
-                  {skill}
-                  <button
-                    type="button"
-                    onClick={() => handleRemoveSkill(idx)}
-                    className="text-red-400 font-bold"
-                  >
-                    ✕
-                  </button>
-                </div>
-              ))
-            ) : (
-              <p className="text-slate-400 text-sm">No skills added</p>
-            )}
-          </div>
-          <div className="flex gap-2">
-            <input
-              type="text"
-              placeholder="Enter a new skill"
-              name="newSkill"
-              value={form.newSkill}
-              onChange={handleChange}
-              className="flex-1 px-3 py-2 rounded-lg bg-[#11121f] border border-cyan-500 text-white"
-            />
+            {/* Skills */}
+            <div className="bg-slate-50 rounded-lg p-6 border border-slate-200">
+              <h3 className="text-slate-900 font-semibold mb-4">Skills</h3>
+              <div className="flex flex-wrap gap-2 mb-4">
+                {(form.skills || []).length > 0 ? (
+                  form.skills.map((skill, idx) => (
+                    <div
+                      key={idx}
+                      className="bg-blue-100 text-blue-800 px-3 py-1 rounded-full flex items-center gap-2 text-sm font-medium"
+                    >
+                      {skill}
+                      <button
+                        type="button"
+                        onClick={() => handleRemoveSkill(idx)}
+                        className="text-red-600 hover:text-red-800 font-bold ml-1"
+                      >
+                        ✕
+                      </button>
+                    </div>
+                  ))
+                ) : (
+                  <p className="text-slate-500 text-sm">No skills added</p>
+                )}
+              </div>
+              <div className="flex gap-2">
+                <input
+                  type="text"
+                  placeholder="Enter a new skill"
+                  name="newSkill"
+                  value={form.newSkill}
+                  onChange={handleChange}
+                  className="flex-1 px-3 py-2 rounded-lg bg-white border border-slate-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-slate-900"
+                />
             <button
               type="button"
               onClick={() => {
@@ -219,16 +223,16 @@ export default function EditProfile() {
                   }));
                 }
               }}
-              className="px-4 py-2 bg-cyan-500 text-black font-bold rounded-lg hover:brightness-110"
-            >
-              Add
-            </button>
-          </div>
-        </div>
+                  className="px-4 py-2 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition-colors"
+                >
+                  Add
+                </button>
+              </div>
+            </div>
 
-        {/* Experience */}
-        <div className="bg-[#1a1a25]/80 rounded-3xl p-4">
-          <h3 className="text-cyan-400 font-bold mb-3">Experience</h3>
+            {/* Experience */}
+            <div className="bg-slate-50 rounded-lg p-6 border border-slate-200">
+              <h3 className="text-slate-900 font-semibold mb-4">Experience</h3>
           <div className="space-y-2 mb-3">
             {(form.experience || []).length > 0 ? (
               form.experience.map((exp, idx) => (
@@ -256,14 +260,14 @@ export default function EditProfile() {
               <p className="text-slate-400 text-sm">No experience added</p>
             )}
           </div>
-          <div className="space-y-2 bg-[#11121f] p-3 rounded-lg">
+          <div className="space-y-2 bg-slate-50 p-4 rounded-lg border border-slate-200">
             <input
               type="text"
               placeholder="Company"
               name="newCompany"
               value={form.newCompany}
               onChange={handleChange}
-              className="w-full px-3 py-2 rounded-lg bg-[#1a1a25] border border-cyan-500 text-white"
+              className="w-full px-3 py-2 rounded-lg border border-slate-300 text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
             <input
               type="text"
@@ -271,7 +275,7 @@ export default function EditProfile() {
               name="newRole"
               value={form.newRole}
               onChange={handleChange}
-              className="w-full px-3 py-2 rounded-lg bg-[#1a1a25] border border-cyan-500 text-white"
+              className="w-full px-3 py-2 rounded-lg border border-slate-300 text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
             <div className="flex gap-2">
               <input
@@ -279,14 +283,14 @@ export default function EditProfile() {
                 name="newFrom"
                 value={form.newFrom}
                 onChange={handleChange}
-                className="flex-1 px-3 py-2 rounded-lg bg-[#1a1a25] border border-cyan-500 text-white"
+                className="flex-1 px-3 py-2 rounded-lg border border-slate-300 text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
               <input
                 type="date"
                 name="newTo"
                 value={form.newTo}
                 onChange={handleChange}
-                className="flex-1 px-3 py-2 rounded-lg bg-[#1a1a25] border border-cyan-500 text-white"
+                className="flex-1 px-3 py-2 rounded-lg border border-slate-300 text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
             </div>
             <button
@@ -312,7 +316,7 @@ export default function EditProfile() {
                   }));
                 }
               }}
-              className="w-full py-2 bg-cyan-500 text-black font-bold rounded-lg hover:brightness-110"
+              className="w-full py-2 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition-colors"
             >
               Add Experience
             </button>
@@ -320,8 +324,14 @@ export default function EditProfile() {
         </div>
 
         {/* Education */}
-        <div className="bg-[#1a1a25]/80 rounded-3xl p-4">
-          <h3 className="text-cyan-400 font-bold mb-3">Education</h3>
+        <div className="bg-white rounded-lg p-6 shadow-sm border border-slate-200">
+          <h3 className="text-slate-900 font-semibold mb-4 flex items-center gap-2">
+            <svg className="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 14l9-5-9-5-9 5 9 5z" />
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z" />
+            </svg>
+            Education
+          </h3>
           <div className="space-y-2 mb-3">
             {(form.education || []).length > 0 ? (
               form.education.map((edu, idx) => (
@@ -349,14 +359,14 @@ export default function EditProfile() {
               <p className="text-slate-400 text-sm">No education added</p>
             )}
           </div>
-          <div className="space-y-2 bg-[#11121f] p-3 rounded-lg">
+          <div className="space-y-2 bg-slate-50 p-4 rounded-lg border border-slate-200">
             <input
               type="text"
               placeholder="School"
               name="newSchool"
               value={form.newSchool}
               onChange={handleChange}
-              className="w-full px-3 py-2 rounded-lg bg-[#1a1a25] border border-cyan-500 text-white"
+              className="w-full px-3 py-2 rounded-lg border border-slate-300 text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
             <input
               type="text"
@@ -364,7 +374,7 @@ export default function EditProfile() {
               name="newDegree"
               value={form.newDegree}
               onChange={handleChange}
-              className="w-full px-3 py-2 rounded-lg bg-[#1a1a25] border border-cyan-500 text-white"
+              className="w-full px-3 py-2 rounded-lg border border-slate-300 text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
             <div className="flex gap-2">
               <input
@@ -372,14 +382,14 @@ export default function EditProfile() {
                 name="newEduFrom"
                 value={form.newEduFrom}
                 onChange={handleChange}
-                className="flex-1 px-3 py-2 rounded-lg bg-[#1a1a25] border border-cyan-500 text-white"
+                className="flex-1 px-3 py-2 rounded-lg border border-slate-300 text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
               <input
                 type="date"
                 name="newEduTo"
                 value={form.newEduTo}
                 onChange={handleChange}
-                className="flex-1 px-3 py-2 rounded-lg bg-[#1a1a25] border border-cyan-500 text-white"
+                className="flex-1 px-3 py-2 rounded-lg border border-slate-300 text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
             </div>
             <button
@@ -405,7 +415,7 @@ export default function EditProfile() {
                   }));
                 }
               }}
-              className="w-full py-2 bg-cyan-500 text-black font-bold rounded-lg hover:brightness-110"
+              className="w-full py-2 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition-colors"
             >
               Add Education
             </button>
@@ -415,7 +425,7 @@ export default function EditProfile() {
         {/* Submit */}
         <button
           type="submit"
-          className="w-full py-3 rounded-3xl bg-gradient-to-r from-cyan-500 to-purple-500 text-black font-bold hover:brightness-110 transition"
+          className="w-full py-3 rounded-lg bg-blue-600 text-white font-semibold hover:bg-blue-700 transition-colors duration-200"
         >
           Save Changes
         </button>
@@ -424,13 +434,15 @@ export default function EditProfile() {
         <button
           type="button"
           onClick={() => navigate("/profile")}
-          className="w-full py-2 rounded-full border border-cyan-400 text-cyan-400 font-semibold hover:bg-cyan-500 hover:text-black transition"
+          className="w-full py-2 rounded-lg border border-slate-300 text-slate-600 font-medium hover:bg-slate-50 hover:border-slate-400 transition-colors duration-200"
         >
           Cancel
         </button>
 
-        {message && <p className="text-cyan-400 mt-4 text-center">{message}</p>}
-      </form>
+            {message && <p className="text-blue-600 mt-4 text-center font-medium">{message}</p>}
+          </form>
+        </div>
+      </div>
     </div>
   );
 }

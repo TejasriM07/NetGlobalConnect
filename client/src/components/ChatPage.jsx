@@ -19,6 +19,9 @@ export default function ChatPage() {
     const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || "https://netglobalconnect.onrender.com";
     const token = localStorage.getItem("token");
 
+    // Debug log to track user changes
+    console.log("ChatPage rendered with otherUserId:", otherUserId);
+
     // Scroll to bottom
     useEffect(() => {
         messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -38,13 +41,27 @@ export default function ChatPage() {
                 console.error("Failed to fetch users:", err);
             }
         };
+        
+        // Clear previous state when switching users
+        setMessages([]);
+        setNewMessage("");
+        setMyId(null);
+        setMyName("");
+        setOtherUserName("");
+        
         fetchUsers();
     }, [otherUserId]);
 
     // Fetch initial messages
     useEffect(() => {
         const fetchMessages = async () => {
-            if (!myId) return;
+            if (!myId || !otherUserId) return;
+            
+            console.log("Fetching messages between:", myId, "and", otherUserId);
+            
+            // Clear messages when switching to different user
+            setMessages([]);
+            
             try {
                 const res = await axios.get(`${BACKEND_URL}/api/messages/${otherUserId}`, {
                     headers: { Authorization: `Bearer ${token}` },
@@ -52,23 +69,30 @@ export default function ChatPage() {
 
                 if (res.data?.success) {
                     const newMsgs = res.data.data || [];
-                    setMessages((prev) => {
-                        const map = new Map();
-                        [...prev, ...newMsgs].forEach((m) => map.set(m._id, m));
-                        return Array.from(map.values());
-                    });
+                    console.log("Received messages:", newMsgs.length);
+                    setMessages(newMsgs);
                 }
             } catch (err) {
                 console.error("Failed to fetch messages:", err);
             }
         };
         fetchMessages();
-    }, [myId, otherUserId, token]);
+    }, [myId, otherUserId, token, BACKEND_URL]);
 
     // Initialize Socket.IO
     useEffect(() => {
-        if (!myId) return;
-        const socket = io(BACKEND_URL, { auth: { token } });
+        if (!myId || !otherUserId) return;
+        
+        // Clean up existing socket if any
+        if (socketRef.current) {
+            socketRef.current.disconnect();
+            socketRef.current = null;
+        }
+        
+        const socket = io(BACKEND_URL, { 
+            auth: { token },
+            forceNew: true // Force new connection to prevent reuse
+        });
         socketRef.current = socket;
 
         socket.on("connect", () => {
@@ -76,15 +100,23 @@ export default function ChatPage() {
         });
 
         socket.on("private_message", (message) => {
-            if (!message?._id || message.senderId === myId) return;
+            // Only accept messages from the current chat partner
+            if (!message?._id || message.senderId === myId || 
+                (message.senderId !== otherUserId && message.receiverId !== myId)) return;
+            
             setMessages((prev) => {
+                // Prevent duplicates
                 if (prev.some((m) => m._id === message._id)) return prev;
                 return [...prev, message];
             });
         });
 
-        return () => socket.disconnect();
-    }, [myId, BACKEND_URL, token]);
+        return () => {
+            if (socket) {
+                socket.disconnect();
+            }
+        };
+    }, [myId, otherUserId, BACKEND_URL, token]);
 
     // Send message
     const handleSendMessage = async () => {

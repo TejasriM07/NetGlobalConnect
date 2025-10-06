@@ -55,6 +55,9 @@ export const getConnections = () => API.get("/users/connections/connections");
 // Accept/reject request
 export const respondToConnectionRequest = (userId, action) =>
   API.post(`/users/connections/${action}/${userId}`);
+// Disconnect from user
+export const disconnectUser = (userId) => 
+  API.delete(`/users/connections/disconnect/${userId}`);
 
 
 

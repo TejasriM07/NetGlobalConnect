@@ -23,7 +23,12 @@ const Notifications = () => {
 
       if (response.ok) {
         const data = await response.json();
-        setNotifications(data.notifications);
+        console.log('Notifications response:', data); // Debug log
+        if (data.success) {
+          setNotifications(data.notifications || []);
+        }
+      } else {
+        console.error('Failed to fetch notifications:', response.status);
       }
     } catch (error) {
       console.error('Error fetching notifications:', error);

@@ -8,6 +8,7 @@ const {
   listConnections,
   listConnectionRequests,
   searchUsersByName,
+  disconnectUser,
 } = require("../controllers/userConnectionsController");
 
 // Send request
@@ -27,5 +28,8 @@ router.get("/requests", protect, listConnectionRequests);
 
 // Search users by name
 router.get("/search", protect, searchUsersByName);
+
+// Disconnect from user
+router.delete("/disconnect/:id", protect, disconnectUser);
 
 module.exports = router;

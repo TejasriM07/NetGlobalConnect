@@ -134,11 +134,17 @@ export default function Feed() {
 const handleReport = async (postId) => {
   console.log("🔹 Reporting post:", postId);
   try {
-    const res = await reportPost(postId); // assign to res
-    console.log("✅ Report response:", res.data); // now res is defined
+    const res = await reportPost(postId);
+    console.log("✅ Report response:", res.data);
+    
+    // Show success message
+    alert("Post has been reported successfully. Our team will review it.");
+    
+    // Refresh feed to reflect any changes
     fetchFeedPosts();
   } catch (err) {
     console.error("❌ Error reporting post:", err);
+    alert("Failed to report post. Please try again.");
   }
 };
 

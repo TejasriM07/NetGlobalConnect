@@ -4,7 +4,8 @@ import {
   getProfile,
   getConnectionRequests,
   getConnections,
-  respondToConnectionRequest
+  respondToConnectionRequest,
+  disconnectUser
 } from "../api";
 import { User, Briefcase, Star, Users, Mail, Edit3, X } from "lucide-react";
 import defaultAvatar from "../assets/default.jpeg";
@@ -61,6 +62,18 @@ export default function Profile() {
     } catch (err) {
       console.error(err);
       setMessage(`Failed to ${action} request`);
+    }
+  };
+
+  // Disconnect from user
+  const handleDisconnect = async (userId) => {
+    try {
+      await disconnectUser(userId);
+      setMessage("Successfully disconnected");
+      fetchRequestsAndConnections(); // Refresh data
+    } catch (err) {
+      console.error(err);
+      setMessage("Failed to disconnect");
     }
   };
 
@@ -264,16 +277,31 @@ export default function Profile() {
                 {connections.map((conn) => (
                   <div
                     key={conn._id}
-                    className="flex items-center gap-3 p-3 bg-slate-50 rounded-lg border border-slate-200"
+                    className="flex items-center justify-between gap-3 p-3 bg-slate-50 rounded-lg border border-slate-200"
                   >
-                    <img
-                      src={conn.profilePic?.url || defaultAvatar}
-                      alt={conn.name}
-                      className="w-10 h-10 rounded-full object-cover border-2 border-blue-200"
-                    />
-                    <p className="text-slate-900 font-semibold">
-                      {conn.name || conn.email || "Unknown User"}
-                    </p>
+                    <div className="flex items-center gap-3">
+                      <img
+                        src={conn.profilePic?.url || defaultAvatar}
+                        alt={conn.name}
+                        className="w-10 h-10 rounded-full object-cover border-2 border-blue-200"
+                      />
+                      <div>
+                        <p className="text-slate-900 font-semibold">
+                          {conn.name || conn.email || "Unknown User"}
+                        </p>
+                        <p className="text-sm text-slate-600">{conn.email}</p>
+                      </div>
+                    </div>
+                    <button
+                      onClick={() => {
+                        if (window.confirm(`Are you sure you want to disconnect from ${conn.name}?`)) {
+                          handleDisconnect(conn._id);
+                        }
+                      }}
+                      className="px-3 py-1 bg-red-500 hover:bg-red-600 text-white text-sm rounded-lg font-medium transition-colors"
+                    >
+                      Disconnect
+                    </button>
                   </div>
                 ))}
               </div>
