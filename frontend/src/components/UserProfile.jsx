@@ -10,14 +10,12 @@ export default function UserProfile() {
   const [currentUser, setCurrentUser] = useState(null);
   const [message, setMessage] = useState("");
   const [connecting, setConnecting] = useState(false);
+  const [showResume, setShowResume] = useState(false); // Resume modal
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [userRes, meRes] = await Promise.all([
-          getUserById(id),
-          getProfile(),
-        ]);
+        const [userRes, meRes] = await Promise.all([getUserById(id), getProfile()]);
 
         if (userRes.data?.data) setProfile(userRes.data.data);
         else setMessage("User not found.");
@@ -30,8 +28,7 @@ export default function UserProfile() {
     fetchData();
   }, [id]);
 
-  if (!profile || !currentUser)
-    return <p className="text-white p-6">Loading profile...</p>;
+  if (!profile || !currentUser) return <p className="text-white p-6">Loading profile...</p>;
 
   const isConnected = profile.connections?.includes(currentUser._id);
   const isRequestSent = profile.connectionRequests?.includes(currentUser._id);
@@ -40,13 +37,10 @@ export default function UserProfile() {
     setConnecting(true);
     try {
       await sendConnectionRequest(profile._id);
-
-      // update UI instantly
       setProfile((prev) => ({
         ...prev,
         connectionRequests: [...(prev.connectionRequests || []), currentUser._id],
       }));
-
       setMessage("Connection request sent!");
     } catch (err) {
       setMessage("Failed to send request");
@@ -62,9 +56,10 @@ export default function UserProfile() {
         <div className="md:col-span-1 flex flex-col items-center bg-[#11121f]/80 rounded-3xl p-6 shadow-lg border border-[#06b6d4]/40">
           <div className="w-40 h-40 rounded-full border-4 border-cyan-400 shadow-lg overflow-hidden">
             <img
-              src={ typeof profile.profilePic === "string"
-              ? profile.profilePic.trim()
-              : profile.profilePic?.url || defaultAvatar
+              src={
+                typeof profile.profilePic === "string"
+                  ? profile.profilePic.trim()
+                  : profile.profilePic?.url || defaultAvatar
               }
               alt="Profile"
               className="w-full h-full object-cover"
@@ -88,7 +83,7 @@ export default function UserProfile() {
             </div>
           </div>
 
-          {/* Connect & Message Buttons */}
+          {/* Connect, Message & Resume Buttons */}
           <div className="mt-8 flex flex-col items-center gap-4 w-full">
             {!isConnected && !isRequestSent && profile._id !== currentUser._id && (
               <button
@@ -101,12 +96,23 @@ export default function UserProfile() {
             )}
             {isConnected && <p className="text-green-400">Connected</p>}
             {isRequestSent && <p className="text-yellow-400">Request Sent</p>}
+
             <button
               onClick={() => navigate(`/messages/${profile._id}`)}
               className="w-full py-3 rounded-full text-white bg-cyan-600 font-semibold hover:bg-cyan-500 transition shadow-lg"
             >
               Message
             </button>
+
+            {/* View Resume Button */}
+            {profile.resume?.url && (
+              <button
+                onClick={() => setShowResume(true)}
+                className="w-full py-3 rounded-full text-white bg-purple-600 font-semibold hover:bg-purple-500 transition shadow-lg"
+              >
+                View Resume
+              </button>
+            )}
           </div>
         </div>
 
@@ -186,6 +192,42 @@ export default function UserProfile() {
           <p className="text-cyan-400 mt-6 text-center col-span-full">{message}</p>
         )}
       </div>
+
+      {/* Resume Modal */}
+      {showResume && (
+        <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50">
+          <div className="bg-[#11121f] p-4 rounded-2xl w-[90%] max-w-3xl border border-purple-400/40 shadow-xl relative">
+            <button
+              className="absolute top-3 right-3 text-gray-400 hover:text-white text-xl font-bold"
+              onClick={() => setShowResume(false)}
+            >
+              ✕
+            </button>
+            <h2 className="text-purple-400 text-xl font-bold mb-4">Resume</h2>
+
+            {/* Download Button */}
+            <div className="mb-4 text-right">
+              <a
+                href={profile.resume.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                download
+                className="px-4 py-2 bg-purple-600 text-white rounded-full hover:bg-purple-500 transition shadow"
+              >
+                Download Resume
+              </a>
+            </div>
+
+            <div className="w-full h-[70vh]">
+              <iframe
+                src={profile.resume?.url}
+                className="w-full h-full rounded-xl border border-purple-400"
+                title="Resume"
+              />
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

@@ -15,6 +15,7 @@ export default function Profile() {
   const [connections, setConnections] = useState([]);
   const [message, setMessage] = useState("");
   const [showConnections, setShowConnections] = useState(false);
+  const [showResume, setShowResume] = useState(false); 
   const navigate = useNavigate();
   const isAdmin = (profile?.role === "Admin") || (localStorage.getItem("userRole") === "Admin");
 
@@ -149,6 +150,16 @@ export default function Profile() {
             <Edit3 size={18} /> Edit Profile
           </button>
 
+          {/* View Resume Button */}
+          {profile.resume?.url && (
+            <button
+              onClick={() => setShowResume(true)}
+              className="mt-4 w-full py-3 rounded-xl bg-cyan-600 text-white font-semibold flex items-center justify-center gap-2 hover:bg-cyan-500"
+            >
+              <FileText size={18} /> View Resume
+            </button>
+          )}
+
           {/* My Posts Button */}
           <button
             onClick={() => navigate("/my-posts")}
@@ -159,15 +170,15 @@ export default function Profile() {
 
           <button
             onClick={() => {
-            if (profile.role === "JobSeeker") {
-              navigate("/applied-jobs");
-            } else if (profile.role === "Employee") {
-              navigate("/posted-jobs");
-            }
+              if (profile.role === "JobSeeker") {
+                navigate("/applied-jobs");
+              } else if (profile.role === "Employee") {
+                navigate("/posted-jobs");
+              }
             }}
-          className="mt-4 w-full py-3 rounded-xl bg-purple-500 text-white font-semibold flex items-center justify-center gap-2 hover:bg-purple-600"
+            className="mt-4 w-full py-3 rounded-xl bg-purple-500 text-white font-semibold flex items-center justify-center gap-2 hover:bg-purple-600"
           >
-          {profile.role === "JobSeeker" ? "Applied Jobs" : "My Posted Jobs"}
+            {profile.role === "JobSeeker" ? "Applied Jobs" : "My Posted Jobs"}
           </button>
         </div>
 
@@ -364,6 +375,44 @@ export default function Profile() {
             ) : (
               <p className="text-slate-400">No connections yet</p>
             )}
+          </div>
+        </div>
+      )}
+
+      {/* Resume Modal */}
+      {showResume && (
+        <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50">
+          <div className="bg-[#11121f] p-4 rounded-2xl w-[90%] max-w-3xl border border-cyan-400/40 shadow-xl relative">
+            <button
+              className="absolute top-3 right-3 text-gray-400 hover:text-white"
+              onClick={() => setShowResume(false)}
+            >
+              <X size={22} />
+            </button>
+      
+            <h2 className="text-cyan-400 text-xl font-bold mb-4 flex items-center gap-2">
+              <FileText size={20} /> Resume
+            </h2>
+      
+            <div className="flex justify-end mb-2">
+              <a
+                href={profile.resume.url} 
+                download={profile.name + "_Resume.pdf"} 
+                target="_blank"
+                rel="noopener noreferrer"
+                className="px-4 py-2 bg-green-500 text-black rounded-lg hover:bg-green-400 font-semibold"
+              >
+                Download Resume
+              </a>
+            </div>
+      
+            <div className="w-full h-[70vh]">
+              <iframe
+                src={profile.resume.url}
+                className="w-full h-full rounded-xl border border-cyan-400"
+                title="Resume"
+              />
+            </div>
           </div>
         </div>
       )}

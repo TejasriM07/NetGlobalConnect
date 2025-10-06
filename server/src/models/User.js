@@ -36,6 +36,10 @@ const userSchema = new mongoose.Schema(
       url: String,
       publicId: String,
     },
+    resume: {
+      url: String,
+      publicId: String,
+    },
     experience: [experienceSchema],
     education: [educationSchema],
     skills: [String],
