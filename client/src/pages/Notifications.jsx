@@ -3,6 +3,7 @@ import { formatDistanceToNow } from 'date-fns';
 
 const Notifications = () => {
   const token = localStorage.getItem("token");
+  const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || "https://netglobalconnect.onrender.com";
   const [notifications, setNotifications] = useState([]);
   const [loading, setLoading] = useState(true);
   const [unreadCount, setUnreadCount] = useState(0);
@@ -14,7 +15,7 @@ const Notifications = () => {
 
   const fetchNotifications = async () => {
     try {
-      const response = await fetch('https://netglobalconnect.onrender.com/api/notifications', {
+      const response = await fetch(`${BACKEND_URL}/api/notifications`, {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json',
@@ -39,7 +40,7 @@ const Notifications = () => {
 
   const fetchUnreadCount = async () => {
     try {
-      const response = await fetch('https://netglobalconnect.onrender.com/api/notifications/unread-count', {
+      const response = await fetch(`${BACKEND_URL}/api/notifications/unread-count`, {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json',
@@ -57,7 +58,7 @@ const Notifications = () => {
 
   const markAsRead = async (notificationId) => {
     try {
-      const response = await fetch(`https://netglobalconnect.onrender.com/api/notifications/${notificationId}/read`, {
+      const response = await fetch(`${BACKEND_URL}/api/notifications/${notificationId}/read`, {
         method: 'PUT',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -78,7 +79,7 @@ const Notifications = () => {
 
   const markAllAsRead = async () => {
     try {
-      const response = await fetch('https://netglobalconnect.onrender.com/api/notifications/mark-all-read', {
+      const response = await fetch(`${BACKEND_URL}/api/notifications/mark-all-read`, {
         method: 'PUT',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -97,7 +98,7 @@ const Notifications = () => {
 
   const deleteNotification = async (notificationId) => {
     try {
-      const response = await fetch(`https://netglobalconnect.onrender.com/api/notifications/${notificationId}`, {
+      const response = await fetch(`${BACKEND_URL}/api/notifications/${notificationId}`, {
         method: 'DELETE',
         headers: {
           'Authorization': `Bearer ${token}`,

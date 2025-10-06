@@ -11,6 +11,7 @@ export default function Navbar() {
   const [unreadNotifications, setUnreadNotifications] = useState(0);
   const navigate = useNavigate();
   const token = localStorage.getItem("token");
+  const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || "https://netglobalconnect.onrender.com";
 
   useEffect(() => {
     const role = localStorage.getItem("userRole") || "";
@@ -41,7 +42,7 @@ export default function Navbar() {
 
   const fetchUnreadNotifications = async () => {
     try {
-      const response = await fetch('https://netglobalconnect.onrender.com/api/notifications/unread-count', {
+      const response = await fetch(`${BACKEND_URL}/api/notifications/unread-count`, {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json',

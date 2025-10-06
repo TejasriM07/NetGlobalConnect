@@ -1,9 +1,12 @@
 // src/api/index.js
 import axios from "axios";
 
+// Get backend URL from environment variable
+const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || "https://netglobalconnect.onrender.com";
+
 // --- Axios instance ---
 const API = axios.create({
-    baseURL: "https://netglobalconnect.onrender.com/api",
+    baseURL: `${BACKEND_URL}/api`,
 });
 
 // Automatically attach token if exists
@@ -33,7 +36,7 @@ export const registerUser = (formData) =>
 export const loginUser = (data) => API.post("/auth/login", data);
 
 export const googleLogin = () => {
-    window.open("https://netglobalconnect.onrender.com/api/auth/google", "_self");
+    window.open(`${BACKEND_URL}/api/auth/google`, "_self");
 };
 
 // --- Profile ---

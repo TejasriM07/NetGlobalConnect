@@ -6,7 +6,7 @@ import { sendConnectionRequest } from "../api";
 
 export default function SearchResults() {
   const location = useLocation();
-  const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || "https://netglobalconnect.onrender.com";
+  const BACKEND_URL = "https://netglobalconnect-1pu4.onrender.com";
   const token = localStorage.getItem("token");
 
   const initialQuery = location.state?.query || "";

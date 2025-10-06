@@ -7,6 +7,7 @@ export default function Login() {
     const [form, setForm] = useState({ email: "", password: "" });
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState("");
+    const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || "https://netglobalconnect.onrender.com";
 
     const navigate = useNavigate();
 
@@ -75,7 +76,7 @@ export default function Login() {
 
     const handleGoogleLogin = () => {
         console.log("Redirecting to Google OAuth...");
-        window.location.href = "https://netglobalconnect.onrender.com/api/auth/google";
+        window.location.href = `${BACKEND_URL}/api/auth/google`;
     };
 
     return (
