@@ -7,13 +7,14 @@ cloudinary.config({
   api_secret: process.env.CLOUDINARY_API_SECRET,
 });
 
-// ✅ Fixed: Added resource_type: "auto"
-const uploadStream = (buffer, folder = "global_connect_profiles") => {
+// Upload as public (raw for PDFs)
+const uploadPublicPDF = (buffer, folder = "global_connect_resumes") => {
   return new Promise((resolve, reject) => {
     const stream = cloudinary.uploader.upload_stream(
       {
         folder,
-        resource_type: "auto", // 🔥 Allows PDF, images, videos, etc.
+        resource_type: "raw", // PDFs, docs
+        type: "upload", // makes it public
       },
       (error, result) => {
         if (error) return reject(error);
@@ -28,21 +29,19 @@ const uploadStream = (buffer, folder = "global_connect_profiles") => {
 const deleteByPublicId = async (publicId) => {
   if (!publicId) return;
   try {
-    await cloudinary.uploader.destroy(publicId, { resource_type: "auto" });
+    await cloudinary.uploader.destroy(publicId, { resource_type: "raw" });
   } catch (err) {
     console.warn("Cloudinary delete error", err);
   }
 };
 
-const getSignedResumeUrl = (publicId, expiresInSec = 60) => {
+// Public URL for PDF
+const getPublicResumeUrl = (publicId) => {
   if (!publicId) return null;
-
-  return cloudinary.utils.private_download_url(publicId, {
-    resource_type: "raw",   
-    expires_at: Math.floor(Date.now() / 1000) + expiresInSec,
-    attachment: false       
+  return cloudinary.url(publicId, {
+    resource_type: "raw",
+    type: "upload", // public access
   });
 };
 
-
-module.exports = { uploadStream, deleteByPublicId, getSignedResumeUrl };
+module.exports = { uploadPublicPDF, deleteByPublicId, getPublicResumeUrl };

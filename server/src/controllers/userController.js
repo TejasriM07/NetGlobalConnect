@@ -1,5 +1,9 @@
 const User = require("../models/User");
-const { uploadStream, getSignedResumeUrl } = require("../utils/cloudinary");
+const {
+  uploadStream,
+  uploadPublicPDF,
+  getPublicResumeUrl,
+} = require("../utils/cloudinary");
 
 // Get logged-in user profile
 const getProfile = async (req, res) => {
@@ -10,7 +14,7 @@ const getProfile = async (req, res) => {
   }
 };
 
-// Get signed resume URL for a user
+// Get public resume URL for a user
 const getResume = async (req, res) => {
   try {
     const { id } = req.params;
@@ -22,19 +26,19 @@ const getResume = async (req, res) => {
         .json({ success: false, message: "Resume not found" });
     }
 
-    const signedUrl = getSignedResumeUrl(user.resume.publicId, 300, { attachment: false });
+    // Public URL
+    const publicUrl = getPublicResumeUrl(user.resume.publicId);
 
-    return res.json({ success: true, url: signedUrl });
+    return res.json({ success: true, url: publicUrl });
   } catch (err) {
     console.error(err);
     return res
       .status(500)
-      .json({ success: false, message: "Failed to generate resume URL" });
+      .json({ success: false, message: "Failed to get resume URL" });
   }
 };
 
-
-// Update profile (optional profile image)
+// Update profile (optional profile image and resume)
 const updateProfile = async (req, res) => {
   try {
     const updates = req.body; // name, bio, skills, etc.
@@ -58,7 +62,8 @@ const updateProfile = async (req, res) => {
         });
       }
 
-      const uploadRes = await uploadStream(
+      // Upload as public PDF
+      const uploadRes = await uploadPublicPDF(
         file.buffer,
         "global_connect_resumes"
       );
