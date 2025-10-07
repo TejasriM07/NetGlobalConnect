@@ -8,7 +8,7 @@ export default function MessagesList() {
 
   // ✅ Only use Vite-style env variables
   const BACKEND_URL =
-    "https://netglobalconnect-1pu4.onrender.com";
+    import.meta.env.VITE_BACKEND_URL || "https://netglobalconnect-1pu4.onrender.com";
 
   const token = localStorage.getItem("token");
 

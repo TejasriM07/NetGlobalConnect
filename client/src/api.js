@@ -2,7 +2,7 @@
 import axios from "axios";
 
 // Get backend URL from environment variable
-const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || "https://netglobalconnect.onrender.com";
+const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || "https://netglobalconnect-1pu4.onrender.com";
 
 // --- Axios instance ---
 const API = axios.create({

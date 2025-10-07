@@ -16,7 +16,7 @@ export default function ChatPage() {
     const messagesEndRef = useRef(null);
     const socketRef = useRef(null);
 
-    const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || "https://netglobalconnect.onrender.com";
+    const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || "https://netglobalconnect-1pu4.onrender.com";
     const token = localStorage.getItem("token");
 
     // Debug log to track user changes
