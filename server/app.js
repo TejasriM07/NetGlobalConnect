@@ -20,9 +20,8 @@ app.use(
   cors({
     origin: [
       "https://net-global-connect.netlify.app",
-      "https://playful-raindrop-fed49f.netlify.app",
-      "https://amazing-gumption-6b73bc.netlify.app",
-      "https://68e3c7ec8eb297e7aa5fdae2--amazing-gumption-6b73bc.netlify.app",
+      "https://netglobal.netlify.app",
+
       process.env.FRONTEND_URL
     ].filter(Boolean),
     credentials: true,
