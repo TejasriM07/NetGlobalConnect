@@ -26,6 +26,9 @@ router.post("/:postId/report", protect, postController.reportPost);
 // List all posts
 router.get("/", protect, postController.listPosts);
 
+// Get posts by specific user
+router.get("/user/:userId", protect, postController.getUserPosts);
+
 // Admin: list reported posts
 router.get("/reported", protect, roleCheck(["Admin"]), postController.listReportedPosts);
 

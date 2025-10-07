@@ -16,7 +16,7 @@ export default function ChatPage() {
     const messagesEndRef = useRef(null);
     const socketRef = useRef(null);
 
-    const BACKEND_URL = "https://netglobalconnect-1pu4.onrender.com";
+    const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || "https://netglobalconnect.onrender.com";
     const token = localStorage.getItem("token");
 
     // Debug log to track user changes
@@ -100,15 +100,24 @@ export default function ChatPage() {
         });
 
         socket.on("private_message", (message) => {
-            // Only accept messages from the current chat partner
-            if (!message?._id || message.senderId === myId || 
-                (message.senderId !== otherUserId && message.receiverId !== myId)) return;
+            console.log("Received socket message:", message);
+            // Only accept messages that are:
+            // 1. Not from myself (avoid echo)
+            // 2. Either from the other user TO me, or from me TO the other user
+            if (!message?._id || message.senderId === myId) return;
             
-            setMessages((prev) => {
-                // Prevent duplicates
-                if (prev.some((m) => m._id === message._id)) return prev;
-                return [...prev, message];
-            });
+            // Only show messages in this conversation
+            if (message.senderId === otherUserId || message.receiverId === otherUserId) {
+                setMessages((prev) => {
+                    // Prevent duplicates by checking message ID
+                    if (prev.some((m) => m._id === message._id)) {
+                        console.log("Duplicate message prevented:", message._id);
+                        return prev;
+                    }
+                    console.log("Adding new message:", message._id);
+                    return [...prev, message];
+                });
+            }
         });
 
         return () => {
@@ -148,12 +157,9 @@ export default function ChatPage() {
                 setMessages((prev) =>
                     prev.map((m) => (m._id === tempMessage._id ? res.data.data : m))
                 );
-
-                // Emit to receiver's room
-                socketRef.current.emit("private_message", {
-                    ...res.data.data,
-                    to: otherUserId,
-                });
+                
+                // Don't manually emit - let the backend handle socket broadcasting
+                console.log("Message sent successfully:", res.data.data._id);
             }
         } catch (err) {
             console.error("Send failed:", err);

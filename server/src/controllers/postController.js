@@ -118,12 +118,31 @@ exports.listPosts = async (req, res) => {
     const posts = await Post.find()
       .populate("userId", "name email profilePic")
       .populate("comments.userId", "name email profilePic")
-      .sort({ createdAt: -1 });
+      .sort({ createdAt: -1 }); // Latest posts first
 
     console.log(`Found ${posts.length} posts`);
     res.status(200).json({ success: true, count: posts.length, posts });
   } catch (error) {
     console.error("Error fetching posts:", error);
+    res.status(500).json({ success: false, message: "Server Error" });
+  }
+};
+
+// Get posts by specific user
+exports.getUserPosts = async (req, res) => {
+  try {
+    const { userId } = req.params;
+    console.log("Fetching posts for user:", userId);
+    
+    const posts = await Post.find({ userId })
+      .populate("userId", "name email profilePic")
+      .populate("comments.userId", "name email profilePic")
+      .sort({ createdAt: -1 }); // Latest posts first
+
+    console.log(`Found ${posts.length} posts for user ${userId}`);
+    res.status(200).json({ success: true, count: posts.length, posts });
+  } catch (error) {
+    console.error("Error fetching user posts:", error);
     res.status(500).json({ success: false, message: "Server Error" });
   }
 };

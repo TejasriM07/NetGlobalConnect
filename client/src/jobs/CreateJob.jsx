@@ -8,6 +8,7 @@ export default function CreateJob() {
         description: "",
         skills: "",
         company: "",
+        applicationDeadline: "",
     });
 
     const [message, setMessage] = useState("");
@@ -26,6 +27,7 @@ export default function CreateJob() {
                 title: formData.title,
                 description: formData.description,
                 company: formData.company,
+                applicationDeadline: formData.applicationDeadline,
                 skills: formData.skills
                     .split(",")
                     .map((s) => s.trim())
@@ -41,6 +43,7 @@ export default function CreateJob() {
                     description: "",
                     skills: "",
                     company: "",
+                    applicationDeadline: "",
                 });
             }
         } catch (err) {
@@ -125,6 +128,24 @@ export default function CreateJob() {
                             />
                             <p className="text-slate-500 text-sm mt-1">
                                 Enter skills separated by commas
+                            </p>
+                        </div>
+
+                        <div>
+                            <label className="block text-slate-700 font-semibold mb-2">
+                                Application Deadline *
+                            </label>
+                            <input
+                                type="date"
+                                name="applicationDeadline"
+                                value={formData.applicationDeadline}
+                                onChange={handleChange}
+                                required
+                                min={new Date().toISOString().split('T')[0]}
+                                className="w-full p-3 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                            />
+                            <p className="text-slate-500 text-sm mt-1">
+                                Job will be automatically deactivated after this date
                             </p>
                         </div>
 

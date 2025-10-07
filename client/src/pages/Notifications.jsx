@@ -27,9 +27,18 @@ const Notifications = () => {
         console.log('Notifications response:', data); // Debug log
         if (data.success) {
           setNotifications(data.notifications || []);
+        } else {
+          console.error('Notifications API returned error:', data.message);
         }
       } else {
-        console.error('Failed to fetch notifications:', response.status);
+        console.error('Failed to fetch notifications:', response.status, response.statusText);
+        // Try to get error details
+        try {
+          const errorData = await response.json();
+          console.error('Error details:', errorData);
+        } catch (e) {
+          console.error('Could not parse error response');
+        }
       }
     } catch (error) {
       console.error('Error fetching notifications:', error);
@@ -49,7 +58,12 @@ const Notifications = () => {
 
       if (response.ok) {
         const data = await response.json();
-        setUnreadCount(data.count);
+        console.log('Unread count response:', data);
+        if (data.success) {
+          setUnreadCount(data.count || 0);
+        }
+      } else {
+        console.error('Failed to fetch unread count:', response.status, response.statusText);
       }
     } catch (error) {
       console.error('Error fetching unread count:', error);

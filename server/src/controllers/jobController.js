@@ -5,13 +5,14 @@ const { createNotification } = require("./notificationController");
 // Employee: Post a job
 exports.postJob = async (req, res) => {
   try {
-    const { title, description, skills } = req.body;
+    const { title, description, skills, applicationDeadline } = req.body;
 
     const job = await Job.create({
       postedBy: req.user._id,
       title,
       description,
       skills,
+      applicationDeadline: new Date(applicationDeadline),
     });
 
     res.status(201).json({ success: true, job });
@@ -24,7 +25,20 @@ exports.postJob = async (req, res) => {
 // List all jobs
 exports.listJobs = async (req, res) => {
   try {
-    const jobs = await Job.find().populate("postedBy", "name email");
+    // First, deactivate expired jobs
+    await Job.updateMany(
+      { 
+        applicationDeadline: { $lt: new Date() },
+        isActive: true 
+      },
+      { isActive: false }
+    );
+
+    // Return only active jobs
+    const jobs = await Job.find({ isActive: true })
+      .populate("postedBy", "name email")
+      .sort({ createdAt: -1 }); // Latest jobs first
+      
     res.status(200).json({ success: true, count: jobs.length, jobs });
   } catch (error) {
     console.error(error);
@@ -94,5 +108,22 @@ exports.getApplicants = async (req, res) => {
   } catch (error) {
     console.error(error);
     res.status(500).json({ success: false, message: "Server Error" });
+  }
+};
+
+// Cleanup expired jobs (can be called periodically)
+exports.cleanupExpiredJobs = async () => {
+  try {
+    const result = await Job.updateMany(
+      { 
+        applicationDeadline: { $lt: new Date() },
+        isActive: true 
+      },
+      { isActive: false }
+    );
+    console.log(`Deactivated ${result.modifiedCount} expired jobs`);
+    return result;
+  } catch (error) {
+    console.error("Error cleaning up expired jobs:", error);
   }
 };

@@ -5,7 +5,10 @@ import {
   getConnectionRequests,
   getConnections,
   respondToConnectionRequest,
-  disconnectUser
+  disconnectUser,
+  getUserPosts,
+  deletePost,
+  updatePost
 } from "../api";
 import { User, Briefcase, Star, Users, Mail, Edit3, X } from "lucide-react";
 import defaultAvatar from "../assets/default.jpeg";
@@ -14,8 +17,11 @@ export default function Profile() {
   const [profile, setProfile] = useState(null);
   const [connectionRequests, setConnectionRequests] = useState([]);
   const [connections, setConnections] = useState([]);
+  const [userPosts, setUserPosts] = useState([]);
   const [message, setMessage] = useState("");
   const [showConnections, setShowConnections] = useState(false);
+  const [showPosts, setShowPosts] = useState(false);
+  const [editingPost, setEditingPost] = useState(null);
   const navigate = useNavigate();
 
   // Fetch profile info
@@ -51,7 +57,18 @@ export default function Profile() {
   useEffect(() => {
     fetchProfileData();
     fetchRequestsAndConnections();
+    fetchUserPosts();
   }, []);
+
+  // Fetch user's posts
+  const fetchUserPosts = async () => {
+    try {
+      const res = await getUserPosts("me"); // "me" for current user
+      setUserPosts(res.data?.posts || []);
+    } catch (err) {
+      console.error("Failed to fetch user posts:", err);
+    }
+  };
 
   // Accept or reject connection requests
   const handleRequest = async (userId, action) => {
@@ -74,6 +91,36 @@ export default function Profile() {
     } catch (err) {
       console.error(err);
       setMessage("Failed to disconnect");
+    }
+  };
+
+  // Delete post
+  const handleDeletePost = async (postId) => {
+    if (window.confirm("Are you sure you want to delete this post?")) {
+      try {
+        await deletePost(postId);
+        setMessage("Post deleted successfully");
+        fetchUserPosts(); // Refresh posts
+      } catch (err) {
+        console.error(err);
+        setMessage("Failed to delete post");
+      }
+    }
+  };
+
+  // Edit post
+  const handleEditPost = async (postId, newContent) => {
+    try {
+      const formData = new FormData();
+      formData.append('content', newContent);
+      
+      await updatePost(postId, formData);
+      setMessage("Post updated successfully");
+      setEditingPost(null);
+      fetchUserPosts(); // Refresh posts
+    } catch (err) {
+      console.error(err);
+      setMessage("Failed to update post");
     }
   };
 
@@ -105,6 +152,14 @@ export default function Profile() {
               <Users className="text-blue-600" size={20} />
               <span className="flex-1 text-slate-700">Connections</span>
               <span className="font-bold text-slate-900">{connections.length}</span>
+            </div>
+            <div
+              className="flex items-center gap-3 p-3 rounded-lg bg-slate-50 border border-slate-200 cursor-pointer hover:bg-slate-100 transition-colors"
+              onClick={() => setShowPosts(true)}
+            >
+              <Edit3 className="text-blue-600" size={20} />
+              <span className="flex-1 text-slate-700">My Posts</span>
+              <span className="font-bold text-slate-900">{userPosts.length}</span>
             </div>
             <div className="flex items-center gap-3 p-3 rounded-lg bg-slate-50 border border-slate-200">
               <Star className="text-blue-600" size={20} />
@@ -307,6 +362,110 @@ export default function Profile() {
               </div>
             ) : (
               <p className="text-slate-400">No connections yet</p>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* Posts Modal */}
+      {showPosts && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-xl p-6 max-w-4xl w-full max-h-[80vh] overflow-y-auto">
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="text-2xl font-bold text-slate-900">My Posts</h2>
+              <button
+                onClick={() => setShowPosts(false)}
+                className="text-slate-400 hover:text-slate-600"
+              >
+                <X size={24} />
+              </button>
+            </div>
+            
+            {userPosts.length > 0 ? (
+              <div className="space-y-4">
+                {userPosts.map((post) => (
+                  <div key={post._id} className="border border-slate-200 rounded-lg p-4">
+                    <div className="flex justify-between items-start mb-3">
+                      <div className="flex items-center gap-3">
+                        <img
+                          src={post.userId?.profilePic?.url || defaultAvatar}
+                          alt={post.userId?.name}
+                          className="w-10 h-10 rounded-full object-cover"
+                        />
+                        <div>
+                          <h4 className="font-semibold text-slate-900">{post.userId?.name}</h4>
+                          <p className="text-sm text-slate-500">
+                            {new Date(post.createdAt).toLocaleDateString()}
+                          </p>
+                        </div>
+                      </div>
+                      <div className="flex gap-2">
+                        <button
+                          onClick={() => setEditingPost(post._id)}
+                          className="text-blue-600 hover:text-blue-800 text-sm"
+                        >
+                          Edit
+                        </button>
+                        <button
+                          onClick={() => handleDeletePost(post._id)}
+                          className="text-red-600 hover:text-red-800 text-sm"
+                        >
+                          Delete
+                        </button>
+                      </div>
+                    </div>
+                    
+                    {editingPost === post._id ? (
+                      <div className="mt-3">
+                        <textarea
+                          defaultValue={post.content}
+                          className="w-full p-3 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                          rows={3}
+                          onKeyDown={(e) => {
+                            if (e.key === 'Enter' && e.ctrlKey) {
+                              handleEditPost(post._id, e.target.value);
+                            }
+                          }}
+                        />
+                        <div className="flex gap-2 mt-2">
+                          <button
+                            onClick={(e) => {
+                              const textarea = e.target.parentElement.previousElementSibling;
+                              handleEditPost(post._id, textarea.value);
+                            }}
+                            className="px-3 py-1 bg-blue-600 text-white rounded text-sm"
+                          >
+                            Save
+                          </button>
+                          <button
+                            onClick={() => setEditingPost(null)}
+                            className="px-3 py-1 bg-slate-400 text-white rounded text-sm"
+                          >
+                            Cancel
+                          </button>
+                        </div>
+                      </div>
+                    ) : (
+                      <p className="text-slate-700 mb-3">{post.content}</p>
+                    )}
+                    
+                    {post.image && (
+                      <img
+                        src={post.image.url}
+                        alt="Post"
+                        className="w-full max-w-md rounded-lg mt-3"
+                      />
+                    )}
+                    
+                    <div className="flex items-center gap-4 mt-3 text-sm text-slate-500">
+                      <span>{post.likesCount || 0} likes</span>
+                      <span>{post.commentsCount || 0} comments</span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <p className="text-slate-400 text-center py-8">No posts yet</p>
             )}
           </div>
         </div>

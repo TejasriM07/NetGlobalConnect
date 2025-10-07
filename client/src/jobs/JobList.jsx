@@ -119,6 +119,50 @@ export default function JobList() {
                                             ))}
                                         </div>
 
+                                        {/* Application Deadline */}
+                                        {job.applicationDeadline && (
+                                            <div className="mb-4">
+                                                <p className="text-slate-500 text-sm mb-1">
+                                                    Application Deadline: 
+                                                    <span className="font-medium text-slate-700 ml-1">
+                                                        {new Date(job.applicationDeadline).toLocaleDateString()}
+                                                    </span>
+                                                </p>
+                                                {(() => {
+                                                    const deadline = new Date(job.applicationDeadline);
+                                                    const now = new Date();
+                                                    const timeDiff = deadline - now;
+                                                    const daysLeft = Math.ceil(timeDiff / (1000 * 60 * 60 * 24));
+                                                    
+                                                    if (daysLeft < 0) {
+                                                        return (
+                                                            <p className="text-red-600 text-xs font-medium">
+                                                                Deadline passed
+                                                            </p>
+                                                        );
+                                                    } else if (daysLeft === 0) {
+                                                        return (
+                                                            <p className="text-orange-600 text-xs font-medium">
+                                                                Last day to apply!
+                                                            </p>
+                                                        );
+                                                    } else if (daysLeft <= 3) {
+                                                        return (
+                                                            <p className="text-orange-600 text-xs font-medium">
+                                                                {daysLeft} {daysLeft === 1 ? 'day' : 'days'} left
+                                                            </p>
+                                                        );
+                                                    } else {
+                                                        return (
+                                                            <p className="text-green-600 text-xs font-medium">
+                                                                {daysLeft} {daysLeft === 1 ? 'day' : 'days'} left
+                                                            </p>
+                                                        );
+                                                    }
+                                                })()}
+                                            </div>
+                                        )}
+
                                         <p className="text-slate-500 text-sm mb-4">
                                             Applicants: <span className="font-medium text-slate-700">{applicantsCount}</span>
                                         </p>

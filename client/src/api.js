@@ -76,7 +76,10 @@ export const sendMessage = (conversationId, content) =>
 // --- Feed / Posts ---
 export const getFeed = (userId) => API.get(`/feed/`);
 export const getAllPosts = () => API.get("/posts");
+export const getUserPosts = (userId) => API.get(`/posts/user/${userId}`);
 export const createPost = (formData) => API.post(`/posts`, formData, { headers: { "Content-Type": "multipart/form-data" } });
+export const updatePost = (postId, formData) => API.put(`/posts/${postId}`, formData, { headers: { "Content-Type": "multipart/form-data" } });
+export const deletePost = (postId) => API.delete(`/posts/${postId}`);
 export const likePost = (postId) => API.post(`/posts/${postId}/like`);
 export const reportPost = (postId) => API.post(`/posts/${postId}/report`);
 export const getReportedPosts = () => API.get("/posts/reported");

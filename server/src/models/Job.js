@@ -11,6 +11,14 @@ const jobSchema = new mongoose.Schema(
     description: { type: String, required: true },
     skills: [{ type: String }],
     applicants: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
+    applicationDeadline: {
+      type: Date,
+      required: true,
+    },
+    isActive: {
+      type: Boolean,
+      default: true,
+    },
   },
   { timestamps: true }
 ); // createdAt, updatedAt
