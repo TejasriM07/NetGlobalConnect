@@ -1,4 +1,5 @@
 const Notification = require("../models/Notification");
+const { getIO } = require("../services/socketService");
 
 // Create a new notification
 const createNotification = async (data) => {
@@ -10,6 +11,16 @@ const createNotification = async (data) => {
 
     const notification = new Notification(data);
     await notification.save();
+    // Emit real-time event if socket server is available
+    try {
+      const io = getIO();
+      if (io) {
+        io.to(data.recipient.toString()).emit("notification", notification);
+      }
+    } catch (emitErr) {
+      console.error("Failed to emit notification event:", emitErr);
+    }
+
     return notification;
   } catch (error) {
     console.error("Error creating notification:", error);

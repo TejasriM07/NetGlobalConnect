@@ -1,6 +1,7 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { getConnectionRequests } from "../api";
+import { io } from "socket.io-client";
 
 export default function Navbar() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -12,6 +13,7 @@ export default function Navbar() {
   const navigate = useNavigate();
   const token = localStorage.getItem("token");
   const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || "https://netglobalconnect-1pu4.onrender.com";
+  const socketRef = useRef(null);
 
   useEffect(() => {
     const role = localStorage.getItem("userRole") || "";
@@ -22,6 +24,21 @@ export default function Navbar() {
     if (token) {
       fetchPendingRequests();
       fetchUnreadNotifications();
+      // Initialize socket for real-time notifications
+      try {
+        socketRef.current = io(BACKEND_URL, { auth: { token } });
+        socketRef.current.on("connect", () => {
+          const userId = localStorage.getItem("userId");
+          if (userId) socketRef.current.emit("join", userId);
+        });
+
+        socketRef.current.on("notification", (notif) => {
+          // Increment unread counter when a new notification arrives
+          setUnreadNotifications((prev) => prev + 1);
+        });
+      } catch (socketErr) {
+        console.log("Socket init failed:", socketErr.message);
+      }
       // Set up periodic check for new requests and notifications
       const interval = setInterval(() => {
         fetchPendingRequests();
@@ -29,6 +46,14 @@ export default function Navbar() {
       }, 30000); // Check every 30 seconds
       return () => clearInterval(interval);
     }
+    return () => {
+      // Cleanup socket on unmount or when token changes
+      if (socketRef.current) {
+        socketRef.current.off();
+        socketRef.current.disconnect();
+        socketRef.current = null;
+      }
+    };
   }, [token]);
 
   const fetchPendingRequests = async () => {
@@ -36,7 +61,8 @@ export default function Navbar() {
       const res = await getConnectionRequests();
       setPendingRequests(res.data.requests?.length || 0);
     } catch (err) {
-      console.error("Failed to fetch connection requests:", err);
+      console.log("Backend may be sleeping, will retry on next interval:", err.message);
+      // Don't log full error to avoid console spam when backend sleeps
     }
   };
 
@@ -52,9 +78,12 @@ export default function Navbar() {
       if (response.ok) {
         const data = await response.json();
         setUnreadNotifications(data.count || 0);
+      } else {
+        console.log('Failed to fetch notifications:', response.status);
       }
     } catch (err) {
-      console.error("Failed to fetch unread notifications:", err);
+      console.log("Backend may be sleeping, will retry on next interval:", err.message);
+      // Don't log full error to avoid console spam when backend sleeps
     }
   };
 

@@ -4,6 +4,9 @@ const Message = require("../models/Message");
 
 let io;
 
+// Safe getter for IO instance (may be undefined if sockets not initialized)
+const getIO = () => io;
+
 const initSocket = (server) => {
   io = new Server(server, {
     cors: {
@@ -60,4 +63,4 @@ const initSocket = (server) => {
   });
 };
 
-module.exports = { initSocket, io };
+module.exports = { initSocket, io, getIO };

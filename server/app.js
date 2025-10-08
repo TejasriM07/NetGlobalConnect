@@ -32,6 +32,23 @@ app.use(express.urlencoded({ extended: true }));
 
 app.use(passport.initialize());
 
+// Health check endpoint
+app.get("/", (req, res) => {
+  res.json({ 
+    status: "Server is running", 
+    timestamp: new Date().toISOString(),
+    uptime: process.uptime()
+  });
+});
+
+app.get("/health", (req, res) => {
+  res.json({ 
+    status: "healthy", 
+    timestamp: new Date().toISOString(),
+    uptime: process.uptime()
+  });
+});
+
 // Routes
 app.use("/api/auth", authRoutes);
 app.use("/api/users", userRoutes);

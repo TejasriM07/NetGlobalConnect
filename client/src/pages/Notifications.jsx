@@ -15,6 +15,8 @@ const Notifications = () => {
 
   const fetchNotifications = async () => {
     try {
+      console.log('Fetching notifications from:', `${BACKEND_URL}/api/notifications`);
+      
       const response = await fetch(`${BACKEND_URL}/api/notifications`, {
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -32,6 +34,14 @@ const Notifications = () => {
         }
       } else {
         console.error('Failed to fetch notifications:', response.status, response.statusText);
+        
+        // If it's a 500+ error, backend might be sleeping - try to wake it up
+        if (response.status >= 500) {
+          console.log('Backend may be sleeping, attempting to wake it up...');
+          // Try a simple health check to wake up the server
+          fetch(`${BACKEND_URL}/health`).catch(() => {});
+        }
+        
         // Try to get error details
         try {
           const errorData = await response.json();
@@ -42,6 +52,12 @@ const Notifications = () => {
       }
     } catch (error) {
       console.error('Error fetching notifications:', error);
+      
+      // If it's a network error, backend is likely sleeping
+      if (error.message.includes('Failed to fetch') || error.message.includes('ERR_CONNECTION_CLOSED')) {
+        console.log('Backend appears to be sleeping. This is normal for free Render services.');
+        console.log('The backend will wake up on the next successful request.');
+      }
     } finally {
       setLoading(false);
     }
@@ -63,10 +79,10 @@ const Notifications = () => {
           setUnreadCount(data.count || 0);
         }
       } else {
-        console.error('Failed to fetch unread count:', response.status, response.statusText);
+        console.log('Failed to fetch unread count:', response.status, response.statusText);
       }
     } catch (error) {
-      console.error('Error fetching unread count:', error);
+      console.log('Error fetching unread count (backend may be sleeping):', error.message);
     }
   };
 
