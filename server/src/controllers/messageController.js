@@ -33,8 +33,25 @@ const getMessages = async (req, res) => {
       ],
     }).sort({ timestamp: 1 });
 
+    // Mark messages from the other user as read
+    await Message.updateMany(
+      { senderId: userId, receiverId: req.user._id, isRead: false },
+      { isRead: true }
+    );
+
     return res.json({ success: true, data: messages });
   } catch (err) {
+    return res.status(500).json({ success: false, message: err.message });
+  }
+};
+
+// Get unread message count for logged-in user
+const getUnreadMessagesCount = async (req, res) => {
+  try {
+    const count = await Message.countDocuments({ receiverId: req.user._id, isRead: false });
+    return res.json({ success: true, count });
+  } catch (err) {
+    console.error('Error fetching unread messages count:', err);
     return res.status(500).json({ success: false, message: err.message });
   }
 };

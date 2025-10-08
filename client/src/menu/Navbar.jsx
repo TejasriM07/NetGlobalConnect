@@ -9,7 +9,7 @@ export default function Navbar() {
   const [searchQuery, setSearchQuery] = useState("");
   const [menuOpen, setMenuOpen] = useState(false); // for mobile
   const [pendingRequests, setPendingRequests] = useState(0);
-  const [unreadNotifications, setUnreadNotifications] = useState(0);
+  const [unreadMessages, setUnreadMessages] = useState(0);
   const navigate = useNavigate();
   const token = localStorage.getItem("token");
   const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || "https://netglobalconnect-1pu4.onrender.com";
@@ -22,8 +22,8 @@ export default function Navbar() {
     
     // Fetch pending connection requests
     if (token) {
-      fetchPendingRequests();
-      fetchUnreadNotifications();
+  fetchPendingRequests();
+  fetchUnreadMessages();
       // Initialize socket for real-time notifications
       try {
         socketRef.current = io(BACKEND_URL, { auth: { token } });
@@ -32,9 +32,15 @@ export default function Navbar() {
           if (userId) socketRef.current.emit("join", userId);
         });
 
-        socketRef.current.on("notification", (notif) => {
-          // Increment unread counter when a new notification arrives
-          setUnreadNotifications((prev) => prev + 1);
+        // Listen for incoming messages notifications to show unread ping
+        socketRef.current.on("private_message", (msg) => {
+          // If the message was sent to the logged-in user and not from the current chat,
+          // increment the unread messages ping. We don't have the active chat context here,
+          // so we conservatively increment and allow the chat page to clear when opened.
+          const myId = localStorage.getItem("userId");
+          if (msg.receiverId === myId && msg.senderId !== myId) {
+            setUnreadMessages((prev) => prev + 1);
+          }
         });
       } catch (socketErr) {
         console.log("Socket init failed:", socketErr.message);
@@ -42,7 +48,7 @@ export default function Navbar() {
       // Set up periodic check for new requests and notifications
       const interval = setInterval(() => {
         fetchPendingRequests();
-        fetchUnreadNotifications();
+  fetchUnreadMessages();
       }, 30000); // Check every 30 seconds
       return () => clearInterval(interval);
     }
@@ -65,10 +71,9 @@ export default function Navbar() {
       // Don't log full error to avoid console spam when backend sleeps
     }
   };
-
-  const fetchUnreadNotifications = async () => {
+  const fetchUnreadMessages = async () => {
     try {
-      const response = await fetch(`${BACKEND_URL}/api/notifications/unread-count`, {
+      const response = await fetch(`${BACKEND_URL}/api/messages/unread-count`, {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json',
@@ -77,9 +82,9 @@ export default function Navbar() {
 
       if (response.ok) {
         const data = await response.json();
-        setUnreadNotifications(data.count || 0);
+        setUnreadMessages(data.count || 0);
       } else {
-        console.log('Failed to fetch notifications:', response.status);
+        console.log('Failed to fetch unread messages:', response.status);
       }
     } catch (err) {
       console.log("Backend may be sleeping, will retry on next interval:", err.message);
@@ -173,15 +178,11 @@ export default function Navbar() {
                   </>
                 )}
 
-                <Link to="/messages" className="hover:text-blue-600 transition-colors">
-                  Messages
-                </Link>
-
-                <Link to="/notifications" className="hover:text-blue-600 transition-colors flex items-center gap-1">
-                  Notifications
-                  {unreadNotifications > 0 && (
+                <Link to="/messages" className="hover:text-blue-600 transition-colors flex items-center gap-1">
+                  Inbox
+                  {unreadMessages > 0 && (
                     <span className="bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
-                      {unreadNotifications}
+                      {unreadMessages}
                     </span>
                   )}
                 </Link>
@@ -265,15 +266,11 @@ export default function Navbar() {
                 </>
               )}
 
-              <Link to="/messages" className="block px-3 py-2 rounded text-slate-700 hover:bg-slate-100">
+              <Link to="/messages" className="block px-3 py-2 rounded text-slate-700 hover:bg-slate-100 flex items-center gap-2">
                 Inbox
-              </Link>
-
-              <Link to="/notifications" className="block px-3 py-2 rounded text-slate-700 hover:bg-slate-100 flex items-center gap-2">
-                Notifications
-                {unreadNotifications > 0 && (
+                {unreadMessages > 0 && (
                   <span className="bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
-                    {unreadNotifications}
+                    {unreadMessages}
                   </span>
                 )}
               </Link>
